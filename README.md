@@ -98,4 +98,4 @@ https://www.3df.com.hk
 
 ## Want a CLI alternative instead?
 
-Check out [Densify](https://github.com/hkdb/cpdf), a Python A script to simplify compressing PDF file size with GhostScript
+Check out [Densify](https://github.com/hkdb/cpdf), a Python script to simplify compresses PDF file size with GhostScript
