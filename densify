@@ -216,10 +216,13 @@ class MyWindow(Gtk.Window, threading.Thread):
 
                 return 1
 
+        # Turn iFile to String to Prepare for Next Condition
+        iName = str(os.path.basename(iFile))
+
         # If Specified Input File Name Contains Unsupported Characters, Show Dialog Error Dialog Box and Return to Main Window
         # Security Procaution
-        if not re.match("[A-Za-z0-9_-]", iFile):
-            verbiage = "The input file name contains unsupported characters. Please re-specify your output file name that contains alphabetical letters, numbers, spaces, dashes, and underscores only."
+        if not re.search("^[a-zA-Z0-9_\-.,&+()\[\]!~?@#%]+$", iName):
+            verbiage = "The input file name contains unsupported characters. Please re-specify your output file name that contains alphabetical letters, numbers, spaces, dashes, underscores, and . , & + ( ) [ ] ! ~ ? @ # % special characters only."
             self.warning("Unsupported File Name Convention!", verbiage)
             self.button.set_sensitive(True)
 
@@ -227,8 +230,8 @@ class MyWindow(Gtk.Window, threading.Thread):
 
         # If Specified Output File Name Contains Unsupported Characters, Show Dialog Error Dialog Box and Return to Main Window
         # Security Procaution
-        if not re.match("[A-Za-z0-9_-]", oFile):
-            verbiage = "The output file name contains unsupported characters. Please re-specify your output file name that contains alphabetical letters, spaces, dashes, and underscores only."
+        if not re.search("^[a-zA-Z0-9_\-.&+()\[\]!~?@#%]+$", oName):
+            verbiage = "The output file name contains unsupported characters. Please re-specify your output file name that contains alphabetical letter, numbers, spaces, dashes, underscores, and . , & + ( ) [ ] ! ~ ? @ # % special characters"
             self.warning("Unsupported File Name Convention!", verbiage)
             self.button.set_sensitive(True)
 
