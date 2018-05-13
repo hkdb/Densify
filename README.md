@@ -1,4 +1,4 @@
-# Densify v0.2.0
+# Densify v0.3.0
 **maintained by:** hkdb \<<hkdb@3df.io>\><br />
 
 ## Description
@@ -7,11 +7,15 @@ A GTK+ GUI Application written in Python that simplifies compressing PDF files w
 
 ## Change Log
 
-#### MAY 13th, 2018 - v0.1.0 Released
+#### MAY 16th, 2018 - v0.3.0 Released
 
-- Birth of Densify
+Features:
+- Added Error Handling Unsafe Character \`
 
-#### MAY 13th, 2018 - v0.2.0 Released
+Bug Fixes:
+
+
+### MAY 13th, 2018 - v0.2.0 Released
 
 Features:
 - Improved error handling of filenames - [issue #2](https://github.com/hkdb/Densify/issues/2)
@@ -19,6 +23,10 @@ Features:
 
 Bug Fixes:
 - Support whitespaces in filenames - [issue #1](https://github.com/hkdb/Densify/issues/1)
+
+#### MAY 13th, 2018 - v0.1.0 Released
+
+- Birth of Densify
 
 ## Screenshots
 
@@ -49,8 +57,8 @@ Shows an Error Dialog Message and Returns to Main Window Upon the User Clicking 
 - Input file is not specified
 - Input file does not end with .pdf
 - Input File and Output File are the same
-- Input File Name Contains Unsupported Characters(/\:;)
-- Output File Name Contains Unsupported Characters(/\:;)
+- Input File Name Contains Unsupported Characters(/\\:;\`)
+- Output File Name Contains Unsupported Characters(/\\:;\`)
 
 Questionable Conditions that the application will verify with User via A Dialog Message:
 
