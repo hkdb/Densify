@@ -1,4 +1,4 @@
-# Densify v0.4.0
+# Densify v0.3.0
 **maintained by:** hkdb \<<hkdb@3df.io>\><br />
 
 ## Description
@@ -7,9 +7,10 @@ A GTK+ GUI Application written in Python that simplifies compressing PDF files w
 
 ## Change Log
 
-#### May 17th, 2020 - v0.4.0 Released
+#### May 17th, 2020 - v0.3.0 Released
 
 Features:
+- Added Error Handling Unsafe Character \`
 - Switched to Python3 - also fixes #4
 - Allow User Resize of Window
 - Desktop Notification
@@ -22,13 +23,6 @@ Bug Fixes:
 Notes:
 
 - Changed installation Procedure in README
-
-#### MAY 16th, 2018 - v0.3.0 Released
-
-Features:
-- Added Error Handling Unsafe Character \`
-
-Bug Fixes:
 
 
 ### MAY 13th, 2018 - v0.2.0 Released
