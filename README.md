@@ -1,4 +1,4 @@
-# Densify v0.3.0
+# Densify v0.4.0
 **maintained by:** hkdb \<<hkdb@3df.io>\><br />
 
 ## Description
@@ -6,6 +6,22 @@
 A GTK+ GUI Application written in Python that simplifies compressing PDF files with Ghostscript
 
 ## Change Log
+
+#### May 17th, 2020 - v0.4.0 Released
+
+Features:
+- Switched to Python3 - also fixes #4
+- Allow User Resize of Window
+- Desktop Notification
+- Handling Lower Screen Resolutions - #5
+- Refined installation script (v0.2)
+
+Bug Fixes:
+- Display Icon - #3
+
+Notes:
+
+- Changed installation Procedure in README
 
 #### MAY 16th, 2018 - v0.3.0 Released
 
@@ -69,15 +85,14 @@ Questionable Conditions that the application will verify with User via A Dialog 
 
 Step 1:
 
-Download and place "Densify" folder in /opt
+Download or Clone Densify
 
 Step 2:
 
-Execute the install.sh script to install this application:
+Execute the install.sh script from within the downloaded Densify directory to install this application:
 
 ```
-cd /opt/Densify/
-sudo chmod 755 install.sh
+sudo chmod a+x install.sh
 sudo ./install.sh
 ```
 Enter your sudo password when the dialog pops up.

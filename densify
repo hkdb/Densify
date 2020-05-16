@@ -1,10 +1,10 @@
-#!/usr/bin/python
+#!/usr/bin/python3
 
 #################################################################
 ### PROJECT:
 ### Densify
 ### VERSION:
-### v0.3.0
+### v0.4.0
 ### SCRIPT:
 ### Densify
 ### DESCRIPTION:
@@ -19,37 +19,64 @@
 import threading
 import subprocess
 import traceback
-import Queue
+import queue
 import os
 import re
 import gi
 gi.require_version('Gtk', '3.0')
 from gi.repository import Gtk, GObject
+from gi.overrides import GLib
+import pathlib
 
 class MyWindow(Gtk.Window, threading.Thread):
 
     def __init__(self):
         threading.Thread.__init__(self)
 
+        # Detect Path that the script is running from:
+        run_path = pathlib.Path(__file__).parent.absolute()
+        header = str(run_path) + "/header.png"
+
+        # Detect Screen Resolution
+        disp = ['xrandr']
+        disp_results = ['grep', '*']
+        p = subprocess.Popen(disp, stdout=subprocess.PIPE)
+        p2 = subprocess.Popen(disp_results, stdin=p.stdout, stdout=subprocess.PIPE)
+        p.stdout.close()
+        resolution_string, junk = p2.communicate()
+        resolution = resolution_string.split()[0]
+        rstring = str(resolution)
+        rstring = rstring[1:] # Remove "b" from string
+        rstring = rstring[1:] # Remove "'" from beginning of string
+        rstring = rstring[:-1] # Remove "'" from end of string
+        w, h = rstring.split("x")
+        height = int(h)
+        if height < 800:
+            window_height = 300
+        else:
+            window_height = 450
+
         # Set Window Specification
         Gtk.Window.__init__(self, title="Densify - PDF Compression")
         self.set_position(Gtk.WindowPosition.CENTER)
-        self.set_default_size(450, 300)
+        self.set_default_size(window_height, 300)
+        self.set_resizable(True)
         self.box = Gtk.Box(orientation=Gtk.Orientation.VERTICAL, spacing=8, margin=20)
         self.add(self.box)
 
         # App Logo
-        self.image = Gtk.Image()
-        self.image.set_from_file("header.png")
-        self.box.pack_start(self.image, True, True, padding=1)
+        if height > 730:
+            self.image = Gtk.Image()
+            self.image.set_from_file(header)
+            self.box.pack_start(self.image, True, True, padding=1)
 
         # App About
-        aLabel = Gtk.Label("An Open Source Initiative Sponsored by 3DF")
-        aLabel.set_markup("<small>An <a href=\"https://osi.3df.io\"" "title=\"OSI @ 3DF\">OSI</a> application sponsored by <a href=\"https://www.3df.com.hk\"" "title=\"3DF Ltd.\">3DF</a></small>")
+        aLabel = Gtk.Label(label="An Open Source Initiative Sponsored by 3DF")
+        aLabel.set_markup("<small>An <a href=\"https://osi.3df.io\"" "title=\"OSI @ 3DF\">OSI</a> application sponsored by <a href=\"https://3df.io\"" "title=\"3DF Ltd.\">3DF</a></small>")
         self.box.pack_start(aLabel, True, True, 0)
 
         # App Version
-        vLabel = Gtk.Label("v0.2.0")
+        vLabel = Gtk.Label(label="v0.4.0")
         vLabel.set_justify(Gtk.Justification.CENTER)
         self.box.pack_start(vLabel, True, True, 0)
 
@@ -58,7 +85,7 @@ class MyWindow(Gtk.Window, threading.Thread):
         self.box.pack_start(bar, True, True, 0)
 
         # Specify Input File
-        iLabel = Gtk.Label("PDF:", xalign=0)
+        iLabel = Gtk.Label(label="PDF:", xalign=0)
         self.box.pack_start(iLabel, True, True, 0)
         self.iChooser = Gtk.FileChooserButton()
         self.box.pack_start(self.iChooser, True, True, 0)
@@ -68,7 +95,7 @@ class MyWindow(Gtk.Window, threading.Thread):
         self.box.pack_start(bar1, True, True, 0)
 
         # Specify Compression Type
-        tLabel = Gtk.Label("Type:", xalign=0)
+        tLabel = Gtk.Label(label="Type:", xalign=0)
         self.box.pack_start(tLabel, True, True, 0)
         store = Gtk.ListStore(str)
         for item in ["ebook", "screen", "printer", "prepress", "default"]:
@@ -92,7 +119,7 @@ class MyWindow(Gtk.Window, threading.Thread):
         self.box.pack_start(bar2, True, True, 0)
 
         # Specify Output File
-        oLabel = Gtk.Label("Output:", xalign=0)
+        oLabel = Gtk.Label(label="Output:", xalign=0)
         self.box.pack_start(oLabel, True, True, 0)
         self.oFile = Gtk.Entry()
         self.oFile.set_placeholder_text("compressed.pdf")
@@ -108,7 +135,7 @@ class MyWindow(Gtk.Window, threading.Thread):
         self.box.pack_start(bar3, True, True, 0)
 
         # Progress Bar
-        pLabel = Gtk.Label("Status:", xalign=0)
+        pLabel = Gtk.Label(label="Status:", xalign=0)
         self.box.pack_start(pLabel, True, True, 0)
         self.progressbar = Gtk.ProgressBar()
         self.box.pack_start(self.progressbar, True, True, 1)
@@ -116,7 +143,7 @@ class MyWindow(Gtk.Window, threading.Thread):
         text = "Ready"
         self.progressbar.set_text(text)
         self.progressbar.set_show_text(show_text)
-        self.timeout_id = GObject.timeout_add(50, self.on_timeout, None)
+        self.timeout_id = GLib.timeout_add(50, self.on_timeout, None)
         self.activity_mode = False
 
         # Separator
@@ -137,7 +164,7 @@ class MyWindow(Gtk.Window, threading.Thread):
     # Help Button Handler
     def on_help_clicked(self, widget):
         # Show Compression Type Descriptions Help Dialog
-        verbiage = "\n\n\nscreen:\n\nselects low-resolution output similar to the Acrobat Distiller \"Screen Optimized\" setting.\n\nebook:\n\nselects medium-resolution output similar to the Acrobat Distiller \"eBook\" setting.\n\nprinter:\n\nselects output similar to the Acrobat Distiller \"Print Optimized\" setting.\n\nprepress:\n\nselects output similar to Acrobat Distiller \"Prepress Optimized\" setting.\n\ndefault:\n\nselects output intended to be useful across a wide variety of uses, possibly at the expense of a larger output file."
+        verbiage = "\n\n\nscreen:\n\nselects low-resolution output similar to the Acrobat Distiller \"Screen Optimized\" setting.\n\n\nebook:\n\nselects medium-resolution output similar to the Acrobat Distiller \"eBook\" setting.\n\n\nprinter:\n\nselects output similar to the Acrobat Distiller \"Print Optimized\" setting.\n\n\nprepress:\n\nselects output similar to Acrobat Distiller \"Prepress Optimized\" setting.\n\n\ndefault:\n\nselects output intended to be useful across a wide variety of uses, possibly at the expense of a larger output file."
         self.info("Types of Compression", verbiage)
 
     # oHelp Button Handler
@@ -260,11 +287,11 @@ class MyWindow(Gtk.Window, threading.Thread):
         self.cmmd = 'gs -sDEVICE=pdfwrite -dCompatibilityLevel=1.6 -dPDFSETTINGS=/' + cType + ' -dNOPAUSE -dQUIET -dBATCH -sOutputFile=' + "\"" + oFile + "\"" + ' ' + "\"" +iFile + "\""
 
         # Start Compressing
-        q = Queue.Queue()
+        q = queue.Queue()
         cnow = threading.Thread(target=self.compress, args=[q])
         cnow.start()
         # Keep Progress Bar Active
-        while cnow.isAlive():
+        while cnow.is_alive():
             Gtk.main_iteration_do(False)
         # Don't continue until thread is finished
         cnow.join()
@@ -274,6 +301,9 @@ class MyWindow(Gtk.Window, threading.Thread):
 
         # If try succeeds, tell user it succeeded, else, show an error dialog
         if success == True:
+            # Notify User
+            subprocess.run(["notify-send", "PDF Compressed!"])
+
             # Get File Size
             iFileSizeRaw = os.path.getsize(iFile)
             oFileSizeRaw = os.path.getsize(oFile)
@@ -301,6 +331,8 @@ class MyWindow(Gtk.Window, threading.Thread):
             self.info("PDF Compressed!", verbiage)
 
         else:
+            # Notify User
+            subprocess.run(["notify-send", "ERROR!"])
             # Show Error Dialog - Exception
             verbiage = "Something went wrong! Maybe your PDF file is corrupted?"
             self.info("ERROR!", verbiage)
@@ -310,30 +342,34 @@ class MyWindow(Gtk.Window, threading.Thread):
     # Informational Dialog Message
     def info(self, title, verbiage):
         # Show Info Dialog
-        dialog = Gtk.MessageDialog(self, 0, Gtk.MessageType.INFO,
-            Gtk.ButtonsType.OK, title)
+        dialog = Gtk.MessageDialog(parent=self, flags=0, message_type=Gtk.MessageType.INFO,
+            buttons=Gtk.ButtonsType.OK, text=title)
         dialog.format_secondary_text(verbiage)
         response = dialog.run()
         dialog.destroy()
+
+        return response
 
     # Warning Dialog Message
     def warning(self, title, verbiage):
         # Pause Compression Progress Bar
         self.pause()
         # Show Error Dialog
-        dialog = Gtk.MessageDialog(self, 0, Gtk.MessageType.WARNING,
-            Gtk.ButtonsType.OK, title)
+        dialog = Gtk.MessageDialog(parent=self, flags=0, message_type=Gtk.MessageType.WARNING,
+            buttons=Gtk.ButtonsType.OK, text=title)
         dialog.format_secondary_text(verbiage)
         response = dialog.run()
         dialog.destroy()
+
+        return response
 
     # Verify What to Do Dialog Message
     def verify(self, title, verbiage):
         # Pause Compression Progress Bar
         self.pause()
         # Show Error Dialog
-        dialog = Gtk.MessageDialog(self, 0, Gtk.MessageType.WARNING,
-            Gtk.ButtonsType.OK_CANCEL, title)
+        dialog = Gtk.MessageDialog(parent=self, flags=0, message_type=Gtk.MessageType.WARNING,
+            buttons=Gtk.ButtonsType.OK_CANCEL, text=title)
         dialog.format_secondary_text(verbiage)
         response = dialog.run()
         dialog.destroy()
@@ -425,7 +461,7 @@ class MyWindow(Gtk.Window, threading.Thread):
 # Initiate Window
 win = MyWindow()
 win.start()
-win.set_icon_from_file("icon.png") # Set App Icon
+win.set_icon_from_file(str(pathlib.Path(__file__).parent.absolute()) + "/icon.png") # Set App Icon
 win.connect("destroy", Gtk.main_quit)
 win.show_all()
 Gtk.main()
