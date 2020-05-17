@@ -1,4 +1,4 @@
-# Densify v0.3.0
+# Densify v0.3.1
 **maintained by:** hkdb \<<hkdb@3df.io>\><br />
 
 ## Description
@@ -6,6 +6,11 @@
 A GTK+ GUI Application written in Python that simplifies compressing PDF files with Ghostscript
 
 ## Change Log
+
+#### May 17th, 2020 - v0.3.1 Released
+
+Hotfix:
+- Increased "do not show logo" condition to "any display under 800 (h)"
 
 #### May 17th, 2020 - v0.3.0 Released
 

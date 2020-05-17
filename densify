@@ -4,7 +4,7 @@
 ### PROJECT:
 ### Densify
 ### VERSION:
-### v0.3.0
+### v0.3.1
 ### SCRIPT:
 ### Densify
 ### DESCRIPTION:
@@ -65,7 +65,7 @@ class MyWindow(Gtk.Window, threading.Thread):
         self.add(self.box)
 
         # App Logo
-        if height > 730:
+        if height > 799:
             self.image = Gtk.Image()
             self.image.set_from_file(header)
             self.box.pack_start(self.image, True, True, padding=1)
@@ -76,7 +76,7 @@ class MyWindow(Gtk.Window, threading.Thread):
         self.box.pack_start(aLabel, True, True, 0)
 
         # App Version
-        vLabel = Gtk.Label(label="v0.3.0")
+        vLabel = Gtk.Label(label="v0.3.1")
         vLabel.set_justify(Gtk.Justification.CENTER)
         self.box.pack_start(vLabel, True, True, 0)
 
