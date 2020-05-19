@@ -2,12 +2,16 @@
 
 ![Densify Logo](res/desktop-icon.png)
 
-1. Build AppImage for Testing
+1. Update Source Directory
+   ```
+   ./update.sh
+   ```
+2. Build AppImage for Testing
    ```
    ./build.sh
    ```
-1. Test that AppImage works
-2. Sign and Rebuild AppImage
+3. Test that AppImage works
+4. Sign and Rebuild AppImage
    ```
    ./signAppImage.sh
    ```
