@@ -11,3 +11,11 @@
    ```
    ./signAppImage.sh
    ```
+   *Note must change the key value in signAppImage.sh if packaged by someone else
+
+<br>
+
+To Clean the build, simply execute:
+```
+./clean.sh
+```
