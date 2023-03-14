@@ -22,4 +22,5 @@ mkdir -p /opt/Densify
 cp densify /opt/Densify
 cp *.png /opt/Densify
 cp densify.desktop /usr/share/applications/
+cp densify.mo /usr/share/locale/it/LC_MESSAGES/
 echo "Installation Complete. If you don't see any errors above, you are good to go! :)"
