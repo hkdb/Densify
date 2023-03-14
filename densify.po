@@ -1,0 +1,227 @@
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C) YEAR ORGANIZATION
+# FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: PACKAGE VERSION\n"
+"POT-Creation-Date: 2023-02-22 23:26+0100\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: LANGUAGE <LL@li.org>\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Generated-By: pygettext.py 1.5\n"
+
+
+#: densify:67
+msgid "Densify - PDF Compression"
+msgstr "Densify - Compressione PDF"
+
+#: densify:81
+msgid "An Open Source Initiative Sponsored by 3DF"
+msgstr "Una iniziativa Open Source sostenuta da 3D"
+
+#: densify:82
+msgid "<small>An <a href=\"https://osi.3df.io\"title=\"OSI @ 3DF\">OSI</a> application sponsored by <a href=\"https://3df.io\"title=\"3DF Ltd.\">3DF</a></small>"
+msgstr "<small>Una applicazione <a href=\"https://osi.3df.io\"title=\"OSI @ "
+"3DF\">OSI</a> sostenuta da <a href=\"https://3df.io\"title=\"3DF Ltd.\">3DF</"
+"a></small>"
+
+#: densify:107
+msgid "Type:"
+msgstr "Tipo"
+
+#: densify:110
+msgid "default"
+msgstr "Preimpostato"
+
+#: densify:110
+msgid "prepress"
+msgstr "prestampa"
+
+#: densify:110
+msgid "printer"
+msgstr "stampa"
+
+#: densify:110
+msgid "screen"
+msgstr "schermo"
+
+#: densify:131
+msgid "Output:"
+msgstr "Destinazione"
+
+#: densify:134
+msgid "_compressed.pdf"
+msgstr "_compresso.pdf"
+
+#: densify:148
+msgid "Status:"
+msgstr "Stato"
+
+#: densify:153
+msgid "Ready"
+msgstr "Pronto"
+
+#: densify:164
+msgid "Compress Now!"
+msgstr "Adesso comprimi!"
+
+#: densify:179
+msgid "File chooosen: "
+msgstr "File scelto:"
+
+#: densify:184
+msgid ""
+"\n"
+"\n"
+"\n"
+"screen:\n"
+"\n"
+"selects low-resolution output similar to the Acrobat Distiller \"Screen Optimized\" setting.\n"
+"\n"
+"\n"
+"ebook:\n"
+"\n"
+"selects medium-resolution output similar to the Acrobat Distiller \"eBook\" setting.\n"
+"\n"
+"\n"
+"printer:\n"
+"\n"
+"selects output similar to the Acrobat Distiller \"Print Optimized\" setting.\n"
+"\n"
+"\n"
+"prepress:\n"
+"\n"
+"selects output similar to Acrobat Distiller \"Prepress Optimized\" setting.\n"
+"\n"
+"\n"
+"default:\n"
+"\n"
+"selects output intended to be useful across a wide variety of uses, possibly at the expense of a larger output file."
+msgstr ""
+"\n"
+"\n"
+"\n"
+"schermo:\n"
+"\n"
+"seleziona una bassa risoluzione simile ad Acrobat Distiller \"Screen Optimized\" setting.\n"
+"\n"
+"\n"
+"ebook:\n"
+"\n"
+"seleziona una risoluzione media simile ad the Acrobat Distiller \"eBook\" setting.\n"
+"\n"
+"\n"
+"stampante:\n"
+"\n"
+"seleziona una risoluzione ottimizzata simile ad Acrobat Distiller \"Print Optimized\" setting.\n"
+"\n"
+"\n"
+"prestampa:\n"
+"\n"
+"seleziona una isoluzione ottimizzata simile ad Acrobat Distiller \"Prepress Optimized\" setting.\n"
+"\n"
+"\n"
+"dpredefinita:\n"
+"\n"
+"seleziona la risoluzikone ritenuta utile tra quelle in uso, a scapito di un eventuale file di destinazione più grande.."
+
+#: densify:185
+msgid "Types of Compression"
+msgstr "Tipo di compressione"
+
+#: densify:190
+msgid "The output filename must not be the same as the input file name. The compressed PDF file will be placed in the same folder as your input file folder."
+msgstr "Il nome del file di destinazione non può essere uguale a quello di origine. Il file PDF compresso sarà salvato nella stessa cartella del file di origine."
+
+#: densify:207
+msgid "compressed.pdf"
+msgstr "compresso.pdf"
+
+#: densify:212
+msgid "The input file field is empty. Please specify an input file to compress..."
+msgstr "Il campo file origine è vuoto. Specifica un file origine da comprimere per favore..."
+
+#: densify:224
+msgid "Only PDF files can be compressed with this application. Please specify a pdf file"
+msgstr "Con questo programma si possono comprimere solo file PDF. Scegli un file pdf per favore."
+
+#: densify:225 densify:352 densify:355
+msgid "ERROR!"
+msgstr "ERRORE!"
+
+#: densify:241
+msgid "The output file name cannot be the same as the input file name."
+msgstr "Il nome del file di destinazione non può essere lo stesso di quello di origine."
+
+#: densify:252
+msgid "The output file name you specified does not end with \".pdf\". Are you sure that's what you want?"
+msgstr "Il nome del file di destinazine scelto non termina con \".pdf\". Sei sicuro di volerlo?"
+
+#: densify:253
+msgid "Output file name does not end with \".pdf\"!"
+msgstr "Il nome del file non termina con \".pdf\"!"
+
+#: densify:269
+msgid "The input file name contains unsupported characters. Please ensure your input file name does not contain special characters / \\ : ; \\`"
+msgstr "Il nome del file di origine contiene dei caratteri non accettati. Per favore assicurati che non contenga / \\ : ; \\'"
+
+#: densify:270 densify:279
+msgid "Unsupported File Name Convention!"
+msgstr "Convenzione del Nome del File non supportata!"
+
+#: densify:278
+msgid "The output file name contains unsupported characters. Please ensure your output file name does not contain special characters / \\ : ; \\`"
+msgstr "Il nome del file di destinazione contiene dei caratteri non accettati. Per favore assicurati che non contenga / \\ : ; \\'"
+
+#: densify:287
+msgid "\" already in the directory. Are you sure you want to overwrite?"
+msgstr "\" già presente nella cartella. Sei sicuro di volerlo sovrascrivere?"
+
+#: densify:287
+msgid "There's a file with the same name, \""
+msgstr "C'è un file con lo stesso nome, \""
+
+#: densify:288
+msgid "WARNING!"
+msgstr "ATTENZIONE!"
+
+#: densify:322 densify:348
+msgid "PDF Compressed!"
+msgstr "PDF Compresso!"
+
+#: densify:347
+msgid " to "
+msgstr " a "
+
+#: densify:354
+msgid "Your PDF File has been successfully compressed from "
+msgstr "Il tuo file è stato compresso con successo da "
+
+#: densify:347
+msgid "! Enjoy!"
+msgstr "! Esulta!"
+
+#: densify:361
+msgid "Something went wrong! Maybe your PDF file is corrupted?"
+msgstr "Qualcosa è andato storto! Forse il tuo file PDF è rovinato?"
+
+#: densify:401 densify:430
+msgid "Compressing..."
+msgstr "Comprimendo..."
+
+#: densify:421
+msgid "Paused"
+msgstr "In pausa"
+
+#: densify:439
+msgid "Completed"
+msgstr "Completato"
+
+#: densify:455
+msgid "There's an error with no trace data..."
+msgstr "C'è un errore non tracciabile..."
+
