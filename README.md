@@ -28,8 +28,7 @@ gs -sDEVICE=pdfwrite -dCompatibilityLevel=1.6 -dPDFSETTINGS=/ebook
 -dNOPAUSE -dQUIET -dBATCH -sOutputFile=[compressed.pdf]
 "[input.pdf]"
 ```
-If watermark is selected a text watermark will be include, If you change de default value ("Reserved" in English) you must supply a [Text].ps file in the /opt/Squeezer directory.
-Presently only Reserved.ps (En) and Riservato.ps (It) are provided.
+If watermark is selected a text watermark will be included in all pages.
 
 ## Error Handling
 
@@ -80,7 +79,7 @@ Now, you can search for "densify" in Gnome Shell Search and you will see that De
 
 ## Future Plans
 
-- Insert watermark directly from code avoiding the use of external file.
+- None
 
 ## Disclaimer
 

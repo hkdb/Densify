@@ -326,11 +326,14 @@ class MyWindow(Gtk.Window, threading.Thread):
         cTypeModel = self.cType.get_model()
         cType = cTypeModel[cTypeIter][0]
 
-        # Build gs Command
+        # Copy watermark label
         filigrana = self.wFile.get_text()
+        bashCommand = "sed 's/Reserved/"+filigrana+"/'"+" watermark.ps > twatermark.ps"
+        os.system(bashCommand)
 
+        # Build gs Command
         if self.Wbutton.get_active():
-            self.cmmd = 'gs -sDEVICE=pdfwrite -dCompatibilityLevel=1.6 -dPDFSETTINGS=/' + cType + ' -dNOPAUSE -dQUIET -dBATCH  -sOutputFile=' + "\"" + oFile + "\"" + " -dALLOWPSTRANSPARENCY " + filigrana + ".ps" + " \"" + iFile + "\""            
+            self.cmmd = 'gs -sDEVICE=pdfwrite -dCompatibilityLevel=1.6 -dPDFSETTINGS=/' + cType + ' -dNOPAUSE -dQUIET -dBATCH  -sOutputFile=' + "\"" + oFile + "\"" + " -dALLOWPSTRANSPARENCY twatermark.ps" + " \"" + iFile + "\""            
         else:
             self.cmmd = 'gs -sDEVICE=pdfwrite -dCompatibilityLevel=1.6 -dPDFSETTINGS=/' + cType + ' -dNOPAUSE -dQUIET -dBATCH -sOutputFile=' + "\"" + oFile + "\"" + ' ' + "\"" +iFile + "\""
         
