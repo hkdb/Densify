@@ -1,5 +1,5 @@
 # Squeeze v0.1.0
-**maintained by:** marianomarini \<<marian.marini@mail.com>\><br />
+**maintained by:** marianomarini \<<mariano.marini@mail.com>\><br />
 A fork from Densify created by hkdb \<<hkdb@3df.io>\><br />
 
 ## Description

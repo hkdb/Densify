@@ -2,25 +2,25 @@
 
 #################################################################
 ### PROJECT:
-### Densify
+### Squeezer
 ### VERSION:
-### v0.2.0
+### v0.1.0
 ### SCRIPT:
 ### install.sh
 ### DESCRIPTION:
-### Install Script for Densify
+### Install Script for Squeezer
 ### MAINTAINED BY:
-### hkdb <hkdb@3df.io>
+### Mariano Marini <mariano.marini@mail.com>
 ### Disclaimer:
 ### This application is maintained by volunteers and in no way
 ### do the maintainers make any guarantees. Use at your own risk.
 ### ##############################################################
 
-chmod a+x densify
-chmod a+x densify.desktop
-mkdir -p /opt/Densify
-cp densify /opt/Densify
-cp *.png /opt/Densify
-cp densify.desktop /usr/share/applications/
-cp densify.mo /usr/share/locale/it/LC_MESSAGES/
+chmod a+x squeezer
+chmod a+x squeezer.desktop
+mkdir -p /opt/Squeezer
+cp squeezer /opt/Squeezer
+cp *.png /opt/Squeezer
+cp squeezer.desktop /usr/share/applications/
+cp squeezer.mo /usr/share/locale/it/LC_MESSAGES/
 echo "Installation Complete. If you don't see any errors above, you are good to go! :)"
