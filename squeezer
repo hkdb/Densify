@@ -144,6 +144,18 @@ class MyWindow(Gtk.Window, threading.Thread):
         bar3 = Gtk.HSeparator()
         self.box.pack_start(bar3, True, True, 0)
 
+        # Watermarker
+        wLabel = Gtk.Label(label=_("Watermark"), xalign=0)
+        self.box.pack_start(wLabel, True, True, 0)
+
+        self.Wbutton = Gtk.ToggleButton(label="OFF")
+        self.Wbutton.connect("toggled", self.on_wbutton_toggled, "1")
+        self.box.pack_start(self.Wbutton, True, True, 0)
+        
+        self.wFile = Gtk.Entry()
+        self.wFile.set_text(_("Reserved"))
+        self.box.pack_start(self.wFile, True, True, 0)
+        
         # Progress Bar
         pLabel = Gtk.Label(label=_("Status:"), xalign=0)
         self.box.pack_start(pLabel, True, True, 0)
@@ -177,7 +189,7 @@ class MyWindow(Gtk.Window, threading.Thread):
         nNameIn = os.path.basename(iName)
         nFileIn = os.path.splitext(nNameIn)[0]
         self.oFile.set_text(nFileIn+self.insert)
-        smesg = _("File chooosen: ")
+#        smesg = _("File chooosen: ")
 #        print (smesg, nNameIn, " - ", self.nPathIn)
 
     # Help Button Handler
@@ -194,6 +206,13 @@ class MyWindow(Gtk.Window, threading.Thread):
         title = _("Output File Name")
         self.info(title, verbiage)
 
+    # verifica Watermark Button
+    def on_wbutton_toggled(self, button, name):
+        if self.Wbutton.get_active():
+            self.Wbutton.set_label("ON")
+        else:
+            self.Wbutton.set_label("OFF")
+    
     # Compression Button Handler - Where all the magic happens
     def on_button_clicked(self, widget):
         # Disable Compress Button
@@ -308,7 +327,12 @@ class MyWindow(Gtk.Window, threading.Thread):
         cType = cTypeModel[cTypeIter][0]
 
         # Build gs Command
-        self.cmmd = 'gs -sDEVICE=pdfwrite -dCompatibilityLevel=1.6 -dPDFSETTINGS=/' + cType + ' -dNOPAUSE -dQUIET -dBATCH -sOutputFile=' + "\"" + oFile + "\"" + ' ' + "\"" +iFile + "\""
+        filigrana = self.wFile.get_text()
+
+        if self.Wbutton.get_active():
+            self.cmmd = 'gs -sDEVICE=pdfwrite -dCompatibilityLevel=1.6 -dPDFSETTINGS=/' + cType + ' -dNOPAUSE -dQUIET -dBATCH  -sOutputFile=' + "\"" + oFile + "\"" + " -dALLOWPSTRANSPARENCY " + filigrana + ".ps" + " \"" + iFile + "\""            
+        else:
+            self.cmmd = 'gs -sDEVICE=pdfwrite -dCompatibilityLevel=1.6 -dPDFSETTINGS=/' + cType + ' -dNOPAUSE -dQUIET -dBATCH -sOutputFile=' + "\"" + oFile + "\"" + ' ' + "\"" +iFile + "\""
         
         # Start Compressing
         q = queue.Queue()
