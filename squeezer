@@ -350,6 +350,10 @@ class MyWindow(Gtk.Window, threading.Thread):
         # Setup Queue to get try catch results
         success = q.get()
 
+        # Delete tmp file (twatwermark.ps)
+        bashCommand = "rm ~/twatermark.ps"
+        os.system(bashCommand)
+
         # If try succeeds, tell user it succeeded, else, show an error dialog
         if success == True:
             # Notify User

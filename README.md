@@ -1,4 +1,4 @@
-# Squeeze v0.1.0
+# Squeeze v0.1.1
 **maintained by:** marianomarini \<<mariano.marini@mail.com>\><br />
 A fork from Densify created by hkdb \<<hkdb@3df.io>\><br />
 
