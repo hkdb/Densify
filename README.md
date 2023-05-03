@@ -17,7 +17,7 @@ With version v0.1.1 a watermark can be inserted in every page.
 
 ![Screenshots](Screenshots/Squeezer-Screen.png "Screenshots")
 
-Notice that compressed.pdf is 4M; the results from compressing a 28M pdf? I then opened up compressed.pdf and it still looked great!
+Notice that compressed.pdf is 1.5M; the results from compressing a 3.8M pdf? I then opened up compressed.pdf and it still looked great!
 
 ## Under the Hood
 
