@@ -5,6 +5,7 @@ A fork from Densify created by hkdb \<<hkdb@3df.io>\><br />
 ## Description
 
 A GTK+ GUI Application written in Python that simplifies compressing PDF files with Ghostscript
+With version v0.1.1 a watermark can be inserted in every page.
 
 ## Change Log
 
@@ -27,6 +28,8 @@ gs -sDEVICE=pdfwrite -dCompatibilityLevel=1.6 -dPDFSETTINGS=/ebook
 -dNOPAUSE -dQUIET -dBATCH -sOutputFile=[compressed.pdf]
 "[input.pdf]"
 ```
+If watermark is selected a text watermark will be include, If you change de default value ("Reserved" in English) you must supply a [Text].ps file in the /opt/Squeezer directory.
+Presently only Reserved.ps (En) and Riservato.ps (It) are provided.
 
 ## Error Handling
 
@@ -77,7 +80,7 @@ Now, you can search for "densify" in Gnome Shell Search and you will see that De
 
 ## Future Plans
 
-- Chance to insert a watermark to the compress PDF
+- Insert watermark directly from code avoiding the use of external file.
 
 ## Disclaimer
 
