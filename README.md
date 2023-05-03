@@ -14,7 +14,7 @@ A GTK+ GUI Application written in Python that simplifies compressing PDF files w
 
 ## Screenshots
 
-![Screenshots](https://osi.3df.io/wp-content/uploads/2018/05/Densify-Screens.png "Screenshots")
+![Screenshots](Screenshots/Squeezer-Screens.png "Screenshots")
 
 Notice that compressed.pdf is 4M; the results from compressing a 28M pdf? I then opened up compressed.pdf and it still looked great!
 
