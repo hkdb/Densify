@@ -1,53 +1,23 @@
-# Densify v0.3.1
-**maintained by:** hkdb \<<hkdb@3df.io>\><br />
+# Squeeze v0.1.1
+**maintained by:** marianomarini \<<mariano.marini@mail.com>\><br />
+A fork from Densify created by hkdb \<<hkdb@3df.io>\><br />
 
 ## Description
 
 A GTK+ GUI Application written in Python that simplifies compressing PDF files with Ghostscript
+With version v0.1.1 a watermark can be inserted in every page.
 
 ## Change Log
 
-#### May 17th, 2020 - v0.3.1 Released
+#### MAY 2th, 2023 - v0.1.0 Released
 
-Hotfix:
-- Increased "do not show logo" condition to "any display under 800 (h)"
-
-#### May 17th, 2020 - v0.3.0 Released
-
-Features:
-- Added Error Handling Unsafe Character \`
-- Switched to Python3 - also fixes #4
-- Allow User Resize of Window
-- Desktop Notification
-- Handling Lower Screen Resolutions - #5
-- Refined installation script (v0.2)
-
-Bug Fixes:
-- Display Icon - #3
-
-Notes:
-
-- Changed installation Procedure in README
-
-
-### MAY 13th, 2018 - v0.2.0 Released
-
-Features:
-- Improved error handling of filenames - [issue #2](https://github.com/hkdb/Densify/issues/2)
-- Support for Chinese & other unicode file names
-
-Bug Fixes:
-- Support whitespaces in filenames - [issue #1](https://github.com/hkdb/Densify/issues/1)
-
-#### MAY 13th, 2018 - v0.1.0 Released
-
-- Birth of Densify
+- Birth of Squeeze
 
 ## Screenshots
 
-![Screenshots](https://osi.3df.io/wp-content/uploads/2018/05/Densify-Screens.png "Screenshots")
+![Screenshots](Screenshots/Squeezer-Screen.png "Screenshots")
 
-Notice that compressed.pdf is 4M; the results from compressing a 28M pdf? I then opened up compressed.pdf and it still looked great!
+Notice that compressed.pdf is 1.5M; the results from compressing a 3.8M pdf? I then opened up compressed.pdf and it still looked great!
 
 ## Under the Hood
 
@@ -58,6 +28,7 @@ gs -sDEVICE=pdfwrite -dCompatibilityLevel=1.6 -dPDFSETTINGS=/ebook
 -dNOPAUSE -dQUIET -dBATCH -sOutputFile=[compressed.pdf]
 "[input.pdf]"
 ```
+If watermark is selected a text watermark will be included in all pages.
 
 ## Error Handling
 
@@ -108,10 +79,7 @@ Now, you can search for "densify" in Gnome Shell Search and you will see that De
 
 ## Future Plans
 
-- Compile to binaries to support Linux with Nuitka
-- Build Debian Packages
-- Build RPM Packages
-- Compile to binaries to support OS X and Windows 10
+- None
 
 ## Disclaimer
 
@@ -119,17 +87,7 @@ This application is maintained by volunteers and in no way do the maintainers ma
 
 ## Recognition
 
-Many thanks to Anthony Wong and Koala Yeung for talking me through this and Dr. Haggen So for sharing the following link that inspired me to write this application:
-
-https://www.tjansson.dk/2012/04/compressing-pdfs-using-ghostscript-under-linux/
-
-This is an application utility sponsored by 3DF Limited's Open Source Initiative.
-
-To Learn more please visit:
-
-https://osi.3df.io
-
-https://www.3df.com.hk
+Many thanks to hkdb who create Densify
 
 ## Want a CLI alternative instead?
 

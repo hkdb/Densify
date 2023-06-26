@@ -1,0 +1,250 @@
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
+# This file is distributed under the same license as the PACKAGE package.
+# FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
+#
+#, fuzzy
+msgid ""
+msgstr ""
+"Project-Id-Version: 0.1.0\n"
+"Report-Msgid-Bugs-To: <mariano.marini@mail.com>\n"
+"POT-Creation-Date: 2023-05-03 15:57+0200\n"
+"PO-Revision-Date: 2023-05-03 18:00+0200\n"
+"Last-Translator: Mariano Marini <mariano.marini@mail.com>\n"
+"Language-Team:  LANGUAGE <it.c@li.org>\n"
+"Language: it\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+
+#: squeezer:67
+msgid "Squeezer - PDF Compression"
+msgstr "Squeezer - Compressione PDF"
+
+#: squeezer:81
+msgid "A Personal Open Source Initiative by Mariano Marini"
+msgstr "Una iniziativa Open Source di Mariano Marini"
+
+#: squeezer:107
+msgid "Type:"
+msgstr "Tipo"
+
+#: squeezer:110
+msgid "screen"
+msgstr "schermo"
+
+#: squeezer:110
+msgid "printer"
+msgstr "stampa"
+
+#: squeezer:110
+msgid "prepress"
+msgstr "prestampa"
+
+#: squeezer:110
+msgid "default"
+msgstr "Preimpostato"
+
+#: squeezer:131
+msgid "Output:"
+msgstr "Destinazione"
+
+#: squeezer:134
+msgid "_compressed.pdf"
+msgstr "_compresso.pdf"
+
+#: squeezer:148
+msgid "Status:"
+msgstr "Stato"
+
+#: squeezer:153 squeezer:417
+msgid "Ready"
+msgstr "Pronto"
+
+#: squeezer:164
+msgid "Compress Now!"
+msgstr "Adesso comprimi!"
+
+#: squeezer:180
+msgid "File chooosen: "
+msgstr ""
+
+#: squeezer:186
+msgid ""
+"\n"
+"\n"
+"\n"
+"screen:\n"
+"\n"
+"selects low-resolution output similar to the Acrobat Distiller \"Screen "
+"Optimized\" setting.\n"
+"\n"
+"\n"
+"ebook:\n"
+"\n"
+"selects medium-resolution output similar to the Acrobat Distiller \"eBook\" "
+"setting.\n"
+"\n"
+"\n"
+"printer:\n"
+"\n"
+"selects output similar to the Acrobat Distiller \"Print Optimized\" "
+"setting.\n"
+"\n"
+"\n"
+"prepress:\n"
+"\n"
+"selects output similar to Acrobat Distiller \"Prepress Optimized\" setting.\n"
+"\n"
+"\n"
+"default:\n"
+"\n"
+"selects output intended to be useful across a wide variety of uses, possibly "
+"at the expense of a larger output file."
+msgstr ""
+"\n"
+"\n"
+"\n"
+"schermo:\n"
+"\n"
+"seleziona una bassa risoluzione simile ad Acrobat Distiller \"Screen Optimized\" setting.\n"
+"\n"
+"\n"
+"ebook:\n"
+"\n"
+"seleziona una risoluzione media simile ad the Acrobat Distiller \"eBook\" setting.\n"
+"\n"
+"\n"
+"stampante:\n"
+"\n"
+"seleziona una risoluzione ottimizzata simile ad Acrobat Distiller \"Print Optimized\" setting.\n"
+"\n"
+"\n"
+"prestampa:\n"
+"\n"
+"seleziona una isoluzione ottimizzata simile ad Acrobat Distiller \"Prepress Optimized\" setting.\n"
+"\n"
+"\n"
+"dpredefinita:\n"
+"\n"
+"seleziona la risoluzikone ritenuta utile tra quelle in uso, a scapito di un eventuale file di destinazione più grande.."
+
+#: squeezer:187
+msgid "Types of Compression"
+msgstr "Tipo di compressione"
+
+#: squeezer:193
+msgid ""
+"The output filename must not be the same as the input file name. The "
+"compressed PDF file will be placed in the same folder as your input file "
+"folder."
+msgstr ""
+"Il nome del file di destinazione non può essere uguale a quello di origine."
+" Il file PDF compresso sarà salvato nella stessa cartella del file di "
+"origine"
+
+#: squeezer:194
+msgid "Output File Name"
+msgstr "compresso.pdf"
+
+#: squeezer:217
+msgid ""
+"The input file field is empty. Please specify an input file to compress..."
+msgstr ""
+"Il campo file origine è vuoto. Specifica un file origine da comprimere per favore..."
+
+#: squeezer:229
+msgid ""
+"Only PDF files can be compressed with this application. Please specify a pdf "
+"file"
+msgstr ""
+"Con questo programma si possono comprimere solo file PDF. Scegli un file pdf per "
+"favore."
+
+#: squeezer:230 squeezer:359 squeezer:362
+msgid "ERROR!"
+msgstr "ERRORE!"
+
+#: squeezer:247
+msgid "The output file name cannot be the same as the input file name."
+msgstr "Il nome del file di destinazione non può essere lo stesso di quello di origine."
+
+#: squeezer:258
+msgid ""
+"The output file name you specified does not end with \".pdf\". Are you sure "
+"that's what you want?"
+msgstr ""
+"Il nome del file di destinazine scelto non termina con \".pdf\". Sei sicuro "
+"di volerlo?"
+
+#: squeezer:259
+msgid "Output file name does not end with \".pdf\"!"
+msgstr "Il nome del file non termina con \".pdf\"!"
+
+#: squeezer:275
+msgid ""
+"The input file name contains unsupported characters. Please ensure your "
+"input file name does not contain special characters / \\ : ; \\`"
+msgstr ""
+"Il nome del file di origine contiene dei caratteri non accettati. Per favore "
+"assicurati che non contenga / \\ : ; \\'"
+
+#: squeezer:276 squeezer:286
+msgid "Unsupported File Name Convention!"
+msgstr "Convenzione del Nome del File non supportata!"
+
+#: squeezer:285
+msgid ""
+"The output file name contains unsupported characters. Please ensure your "
+"output file name does not contain special characters / \\ : ; \\`"
+msgstr ""
+"Il nome del file di destinazione contiene dei caratteri non accettati. Per favore assicurati "
+"che non contenga caratteri speciali/ \\ : ; \\'"
+
+#: squeezer:294
+msgid "There's a file with the same name, \""
+msgstr "C'è un file con lo stesso nome, \""
+
+#: squeezer:294
+msgid "\" already in the directory. Are you sure you want to overwrite?"
+msgstr "\"nella cartella. Sei sicuro di volerlo sovrascrivere?"
+
+#: squeezer:295
+msgid "WARNING!"
+msgstr "ATTENZIONE!"
+
+#: squeezer:329 squeezer:355
+msgid "PDF Compressed!"
+msgstr "PDF Compresso!"
+
+#: squeezer:354
+msgid "Your PDF File has been successfully compressed from ("
+msgstr "Il tuo file è stato compresso con successo da ("
+
+#: squeezer:354
+msgid ") to ("
+msgstr ") a ("
+
+#: squeezer:354
+msgid ")! Enjoy!"
+msgstr ")! Esulta!"
+
+#: squeezer:361
+msgid "Something went wrong! Maybe your PDF file is corrupted?"
+msgstr "Qualcosa è andato storto! Forse il tuo file PDF è rovinato?"
+
+#: squeezer:408 squeezer:437
+msgid "Compressing..."
+msgstr "Comprimendo..."
+
+#: squeezer:428
+msgid "Paused"
+msgstr "In pausa"
+
+#: squeezer:446
+msgid "Completed"
+msgstr "Completato"
+
+#: squeezer:462
+msgid "There's an error with no trace data..."
+msgstr "C'è un errore non tracciabile..."
