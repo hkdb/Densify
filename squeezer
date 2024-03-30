@@ -24,6 +24,7 @@ import os
 import re
 import gi
 import gettext
+import sys
 gi.require_version('Gtk', '3.0')
 from gi.repository import Gtk, GObject
 from gi.overrides import GLib
@@ -37,9 +38,10 @@ _ = gettext.gettext
             
 class MyWindow(Gtk.Window, threading.Thread):
 
-    def __init__(self):
+    def __init__(self, nomeFile):
         threading.Thread.__init__(self)
 
+        self.nomeFile = nomeFile
         # Detect Path that the script is running from:
         run_path = pathlib.Path(__file__).parent.absolute()
         header = str(run_path) + "/header.png"
@@ -96,8 +98,10 @@ class MyWindow(Gtk.Window, threading.Thread):
         self.box.pack_start(iLabel, True, True, 0)
         self.iChooser = Gtk.FileChooserButton()
         self.box.pack_start(self.iChooser, True, True, 0)
+#        print(self.nomeFile, file=sys.stdout)
+        self.iChooser.select_filename(self.nomeFile)
+        self.iChooser.set_filename(self.nomeFile)
         self.iChooser.connect("file-set", self.on_filechooserbutton_changed)
-#        print (self.iChooser)
 
         # Separator
         bar1 = Gtk.HSeparator()
@@ -132,7 +136,11 @@ class MyWindow(Gtk.Window, threading.Thread):
         self.box.pack_start(oLabel, True, True, 0)
         self.oFile = Gtk.Entry()
         self.insert = _("_compressed.pdf")
-        self.oFile.set_placeholder_text(self.insert)
+        if self.nomeFile != _("None"):
+            fileOut = self.nomeFile[:-4]+self.insert
+        else:
+            fileOut = self.insert
+        self.oFile.set_placeholder_text(fileOut)
         self.box.pack_start(self.oFile, True, True, 0)
 
         # Help Button - Output File
@@ -185,6 +193,7 @@ class MyWindow(Gtk.Window, threading.Thread):
 
     def on_filechooserbutton_changed(self, widget):
         iName = widget.get_filename()
+ #       print (iName)
         self.nPathIn = os.path.dirname(iName)
         nNameIn = os.path.basename(iName)
         nFileIn = os.path.splitext(nNameIn)[0]
@@ -220,15 +229,18 @@ class MyWindow(Gtk.Window, threading.Thread):
         # Set Progress Bar Text to "Completed" and Progress Bar to Pulse
         self.progress()
 
-        # Set Command Compression Type Variable
-        iFile = self.iChooser.get_filename()
+        self.on_filechooserbutton_changed(self.iChooser)        # Set Command Compression Type Variable
+
         slash = "/"
+        iFile = self.iChooser.get_filename()
 #        oName = self.oFile.get_text()
         oFile = self.nPathIn+slash+self.oFile.get_text()
+#        oFile = self.oFile.get_text()
 
         # If Output file name was not specified, use "compressed.pdf"
 #        if oName == None or oName == "":
 #           oName = _("compressed.pdf")
+#        print (iFile, " -> ", oFile)
 
         # If Input file is not specified, show an error dialog box
         if iFile == None:
@@ -514,7 +526,11 @@ class MyWindow(Gtk.Window, threading.Thread):
         return True
 
 # Initiate Window
-win = MyWindow()
+if len(sys.argv) > 1:
+    nomeFile = os.path.basename(sys.argv[1])
+else:
+    nomeFile = _("None")
+win = MyWindow(nomeFile)
 win.start()
 win.set_icon_from_file(str(pathlib.Path(__file__).parent.absolute()) + "/icon.png") # Set App Icon
 win.connect("destroy", Gtk.main_quit)
