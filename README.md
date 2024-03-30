@@ -55,11 +55,11 @@ Questionable Conditions that the application will verify with User via A Dialog 
 
 Step 1:
 
-Download or Clone Densify
+Download or Clone Squeezer
 
 Step 2:
 
-Execute the install.sh script from within the downloaded Densify directory to install this application:
+Execute the install.sh script from within the downloaded Squeezer directory to install this application:
 
 ```
 sudo chmod a+x install.sh
@@ -70,12 +70,12 @@ Enter your sudo password when the dialog pops up.
 You should then see this:
 
 ```
-hkdb@machine:/opt/Densify$ sudo ./install.sh
+marmar@machine:/opt/Squeezer$ sudo ./install.sh
 Installation Complete. If you don't see any errors above, you are good to go! :)
-hkdb@machine:/opt/Densify$
+marmar@machine:/opt/Squeezer$
 ```
 
-Now, you can search for "densify" in Gnome Shell Search and you will see that Densify is available to launch. Enjoy!
+Now, you can search for "squeezer" in Gnome Shell Search and you will see that Squeezer is available to launch. Enjoy!
 
 ## Future Plans
 
