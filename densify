@@ -215,7 +215,7 @@ class MyWindow(Gtk.Window, threading.Thread):
 
         # Prep Type of Compression - Must happen before comparing iFile and oFile
         if iFile != None:
-            iPath = str(self.iChooser.get_current_folder())
+            iPath = os.path.dirname(iFile)
             oFile = iPath + slash + oName
 
         # If the Input File and Output File are the same, show an error dialog box
@@ -248,8 +248,8 @@ class MyWindow(Gtk.Window, threading.Thread):
 
         # If Specified Input File Name Contains Unsupported Characters, Show Dialog Error Dialog Box and Return to Main Window
         # Security Procaution
-        if re.search('[\\\\\|:;\`]', iName):
-            verbiage = "The input file name contains unsupported characters. Please ensure your input file name does not contain special characters / \\ : ; \`"
+        if re.search('[\\\\|:;`]', iName):
+            verbiage = "The input file name contains unsupported characters. Please ensure your input file name does not contain special characters / \\ : ; `"
             self.warning("Unsupported File Name Convention!", verbiage)
             self.button.set_sensitive(True)
 
@@ -257,8 +257,8 @@ class MyWindow(Gtk.Window, threading.Thread):
 
         # If Specified Output File Name Contains Unsupported Characters, Show Dialog Error Dialog Box and Return to Main Window
         # Security Procaution
-        if re.search('[\\\\\|:;\`]', oName):
-            verbiage = "The output file name contains unsupported characters. Please ensure your output file name does not contain special characters / \\ : ; \`"
+        if re.search('[\\\\|:;`]', oName):
+            verbiage = "The output file name contains unsupported characters. Please ensure your output file name does not contain special characters / \\ : ; `"
             self.warning("Unsupported File Name Convention!", verbiage)
             self.button.set_sensitive(True)
 
