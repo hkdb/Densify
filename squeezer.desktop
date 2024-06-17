@@ -10,4 +10,5 @@ Type=Application
 Icon=/opt/Squeezer/desktop-icon.png
 StartupNotify=true
 Categories=Utility;Application;
-Name[it]=squeezer.desktop
+Name[it]=schiacciatore
+Name[en]=squeezer
