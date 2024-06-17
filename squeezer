@@ -97,11 +97,12 @@ class MyWindow(Gtk.Window, threading.Thread):
         iLabel = Gtk.Label(label="PDF:", xalign=0)
         self.box.pack_start(iLabel, True, True, 0)
         self.iChooser = Gtk.FileChooserButton()
-        self.box.pack_start(self.iChooser, True, True, 0)
-#        print(self.nomeFile, file=sys.stdout)
-        self.iChooser.select_filename(self.nomeFile)
         self.iChooser.set_filename(self.nomeFile)
         self.iChooser.connect("file-set", self.on_filechooserbutton_changed)
+        if (self.nomeFile != _("None")):
+            print ("Imposto nome")
+#            self.iChooser.select_file(self.nomeFile)
+        self.box.pack_start(self.iChooser, True, True, 0)
 
         # Separator
         bar1 = Gtk.HSeparator()
@@ -185,6 +186,9 @@ class MyWindow(Gtk.Window, threading.Thread):
         self.button.set_sensitive(True)
         self.button.connect("clicked", self.on_button_clicked)
         self.box.pack_start(self.button, True, True, 0)
+#        if (self.nomeFile != _("None")):
+#            self.iChooser.set_filename(self.nomeFile)
+#            self.on_filechooserbutton_changed(self.iChooser)
 
     # ComboBox Handler
     def on_combobox_changed(self, combobox):
@@ -193,13 +197,12 @@ class MyWindow(Gtk.Window, threading.Thread):
 
     def on_filechooserbutton_changed(self, widget):
         iName = widget.get_filename()
- #       print (iName)
         self.nPathIn = os.path.dirname(iName)
         nNameIn = os.path.basename(iName)
         nFileIn = os.path.splitext(nNameIn)[0]
         self.oFile.set_text(nFileIn+self.insert)
-#        smesg = _("File chooosen: ")
-#        print (smesg, nNameIn, " - ", self.nPathIn)
+        smesg = _("File chooosen: ")
+        print (smesg, nNameIn, " - ", self.nPathIn)
 
     # Help Button Handler
     def on_help_clicked(self, widget):
@@ -228,8 +231,6 @@ class MyWindow(Gtk.Window, threading.Thread):
         self.button.set_sensitive(False)
         # Set Progress Bar Text to "Completed" and Progress Bar to Pulse
         self.progress()
-
-        self.on_filechooserbutton_changed(self.iChooser)        # Set Command Compression Type Variable
 
         slash = "/"
         iFile = self.iChooser.get_filename()
@@ -528,6 +529,8 @@ class MyWindow(Gtk.Window, threading.Thread):
 # Initiate Window
 if len(sys.argv) > 1:
     nomeFile = os.path.basename(sys.argv[1])
+    cartella = os.path.dirname(sys.argv[1])
+    os.chdir(cartella)
 else:
     nomeFile = _("None")
 win = MyWindow(nomeFile)
