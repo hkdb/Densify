@@ -23,5 +23,6 @@ cp squeezer /opt/Squeezer
 cp *.png /opt/Squeezer
 cp *.ps /opt/Squeezer
 cp squeezer.desktop /usr/share/applications/
+cp icon.png /usr/share/icons/squeezer.png
 cp squeezer.mo /usr/share/locale/it/LC_MESSAGES/
 echo "Installation Complete. If you don't see any errors above, you are good to go! :)"
