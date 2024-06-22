@@ -1,0 +1,14 @@
+[Desktop Entry]
+Version=0.1.0
+Name=Squeezer
+Comment=PDF Compressor
+GenericName=Squeezer
+Exec=/opt/Squeezer/squeezer
+Path=/opt/Squeezer/
+Terminal=false
+Type=Application
+Icon=/opt/Squeezer/desktop-icon.png
+StartupNotify=true
+Categories=Utility;Application;
+Name[it]=schiacciatore
+Name[en]=squeezer
