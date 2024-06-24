@@ -9,7 +9,7 @@ A GTK+ GUI Application written in Python that simplifies compressing PDF files w
 
 #### June 24th, 2024 - v0.3.2 Released
 
-- Fixed #9 - Recent & Drag & Drop
+- Fixed #9 - Recent & Drag & Drop - Thanks to @batikstudio
 - Fixed \ check
 - Added some other illegal filename characters that could potentially be dangerous
 
