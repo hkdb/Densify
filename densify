@@ -76,7 +76,7 @@ class MyWindow(Gtk.Window, threading.Thread):
         self.box.pack_start(aLabel, True, True, 0)
 
         # App Version
-        vLabel = Gtk.Label(label="v0.3.1")
+        vLabel = Gtk.Label(label="v0.3.2")
         vLabel.set_justify(Gtk.Justification.CENTER)
         self.box.pack_start(vLabel, True, True, 0)
 
@@ -248,8 +248,8 @@ class MyWindow(Gtk.Window, threading.Thread):
 
         # If Specified Input File Name Contains Unsupported Characters, Show Dialog Error Dialog Box and Return to Main Window
         # Security Procaution
-        if re.search('[\\\\|:;`]', iName):
-            verbiage = "The input file name contains unsupported characters. Please ensure your input file name does not contain special characters / \\ : ; `"
+        if re.search('[\\\\|/:;`><{}#*\'"]', iName):
+            verbiage = "The input file name contains unsupported characters. Please ensure your input file name does not contain special characters / \\ : ; ` > < } { # * ' \""
             self.warning("Unsupported File Name Convention!", verbiage)
             self.button.set_sensitive(True)
 
@@ -257,8 +257,8 @@ class MyWindow(Gtk.Window, threading.Thread):
 
         # If Specified Output File Name Contains Unsupported Characters, Show Dialog Error Dialog Box and Return to Main Window
         # Security Procaution
-        if re.search('[\\\\|:;`]', oName):
-            verbiage = "The output file name contains unsupported characters. Please ensure your output file name does not contain special characters / \\ : ; `"
+        if re.search('[\\\\|/:;`><{}#*\'"]', oName):
+            verbiage = "The output file name contains unsupported characters. Please ensure your output file name does not contain special characters / \\ : ; ` > < } {  # * ' \""
             self.warning("Unsupported File Name Convention!", verbiage)
             self.button.set_sensitive(True)
 

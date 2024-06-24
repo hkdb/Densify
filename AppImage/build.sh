@@ -1,5 +1,8 @@
 #!/usr/bin/env bash
 
+cp ../densify src/
+cp ../__init__.py src/
+
 # Create Build Directory
 mkdir -p build && cd build
 
