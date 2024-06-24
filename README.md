@@ -112,13 +112,6 @@ hkdb@machine:/opt/Densify$
 
 Now, you can search for "densify" in Gnome Shell Search and you will see that Densify is available to launch. Enjoy!
 
-## Future Plans
-
-- Compile to binaries to support Linux with Nuitka
-- Build Debian Packages
-- Build RPM Packages
-- Compile to binaries to support OS X and Windows 10
-
 ## Disclaimer
 
 This application is maintained by volunteers and in no way do the maintainers make any guarantees. Please use at your own risk!
