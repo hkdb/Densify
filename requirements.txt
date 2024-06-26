@@ -1,0 +1,4 @@
+PyPrind
+PyGObject
+pycairo
+gi

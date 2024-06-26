@@ -88,16 +88,23 @@ Questionable Conditions that the application will verify with User via A Dialog 
 
 ## Installation
 
+Make sure you install the dependencies like `notify-send` and `ghostscript`.
+
+You can then either download the latest AppImage from the release page or follow the below steps.
+
 Step 1:
 
-Download or Clone Densify
+Clone Densify:
+```
+git clone https://github.com/hkdb/Densify.git
+```
 
 Step 2:
 
-Execute the install.sh script from within the downloaded Densify directory to install this application:
+Go into the repo dir and execute the install.sh script from within the downloaded Densify directory to install this application:
 
 ```
-sudo chmod a+x install.sh
+cd Densify
 sudo ./install.sh
 ```
 Enter your sudo password when the dialog pops up.
