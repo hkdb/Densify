@@ -99,9 +99,6 @@ class MyWindow(Gtk.Window, threading.Thread):
         self.iChooser = Gtk.FileChooserButton()
         self.iChooser.set_filename(self.nomeFile)
         self.iChooser.connect("file-set", self.on_filechooserbutton_changed)
-        if (self.nomeFile != _("None")):
-            print ("Imposto nome")
-#            self.iChooser.select_file(self.nomeFile)
         self.box.pack_start(self.iChooser, True, True, 0)
 
         # Separator
@@ -186,9 +183,9 @@ class MyWindow(Gtk.Window, threading.Thread):
         self.button.set_sensitive(True)
         self.button.connect("clicked", self.on_button_clicked)
         self.box.pack_start(self.button, True, True, 0)
-#        if (self.nomeFile != _("None")):
-#            self.iChooser.set_filename(self.nomeFile)
-#            self.on_filechooserbutton_changed(self.iChooser)
+        if (self.nomeFile != _("None")):
+            self.iChooser.set_filename(self.nomeFile)
+            self.on_filechooserbutton_changed(self.iChooser)
 
     # ComboBox Handler
     def on_combobox_changed(self, combobox):
@@ -530,6 +527,9 @@ class MyWindow(Gtk.Window, threading.Thread):
 if len(sys.argv) > 1:
     nomeFile = os.path.basename(sys.argv[1])
     cartella = os.path.dirname(sys.argv[1])
+    if (len(cartella) == 0):
+        cartella = "."
+    print("Cartella = ", cartella)
     os.chdir(cartella)
 else:
     nomeFile = _("None")
