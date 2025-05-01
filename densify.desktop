@@ -10,3 +10,4 @@ Type=Application
 Icon=/opt/Densify/desktop-icon.png
 StartupNotify=true
 Categories=Utility;Application;
+StartupWMClass=densify
