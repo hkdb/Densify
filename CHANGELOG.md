@@ -3,6 +3,7 @@
 #### January 20th, 2026 - v0.4.0 Released
 
 - Ported to GTK4 - [#16](https://github.com/hkdb/Densify/issues/16)
+- Use command list to avoid shell injection (Security)
 - Fixed AppImage - [#15](https://github.com/hkdb/Densify/issues/15)
 - Added dependencies installation in `install.sh` - [#14](https://github.com/hkdb/Densify/issues/14)
 - Changed to Github Actions to build on release
