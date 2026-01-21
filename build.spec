@@ -43,7 +43,7 @@ if system() == "Linux":
             a.scripts,
             [],
             exclude_binaries=True,
-            name='densify',
+            name='Densify',
             debug=False,
             bootloader_ignore_signals=False,
             strip=False,
@@ -62,7 +62,7 @@ if system() == "Linux":
             strip=False,
             upx=True,
             upx_exclude=[],
-            name='densify',
+            name='Densify',
         )
     else:
         exe = EXE(
@@ -71,7 +71,7 @@ if system() == "Linux":
             a.binaries,
             a.datas,
             [],
-            name='densify',
+            name='Densify',
             debug=False,
             bootloader_ignore_signals=False,
             strip=False,

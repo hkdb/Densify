@@ -19,6 +19,19 @@ jobs:
           else
             echo "VERSION=dev" >> $GITHUB_OUTPUT
           fi
+      - name: Install dependencies
+        run: |
+          sudo apt update
+          sudo apt install -y desktop-file-utils
+          sudo ./AppImage/bootstrap.sh
+          python3 -m pip install pycairo
+          python3 -m pip install PyGObject
+      - name: Set up environment
+        run: |
+          cp .env.ci .env
+      - name: Build package
+        run: |
+          python3 build.py
       - name: Create tar.gz archive
         run: |
           VERSION=${{ steps.get_version.outputs.VERSION }}
@@ -33,21 +46,7 @@ jobs:
           cp LICENSE "Densify-${VERSION}/" 2>/dev/null || true
           cp README.md "Densify-${VERSION}/" 2>/dev/null || true
           tar -czvf "Densify-${VERSION}.tar.gz" "Densify-${VERSION}"
-          mkdir -p dist
           mv "Densify-${VERSION}.tar.gz" dist/
-      - name: Install dependencies
-        run: |
-          sudo apt update
-          sudo apt install -y desktop-file-utils
-          sudo ./AppImage/bootstrap.sh
-          python3 -m pip install pycairo
-          python3 -m pip install PyGObject
-      - name: Set up environment
-        run: |
-          cp .env.ci .env
-      - name: Build package
-        run: |
-          python3 build.py
       - name: Store the distribution packages
         uses: actions/upload-artifact@v4
         with:
