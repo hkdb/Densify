@@ -5,11 +5,9 @@
 
 A GTK GUI Application written in Python that simplifies compressing PDF files with Ghostscript
 
-## Screenshots
+## Screenshot
 
-![Screenshots](https://osi.3df.io/wp-content/uploads/2018/05/Densify-Screens.png "Screenshots")
-
-Notice that compressed.pdf is 4M; the results from compressing a 28M pdf? I then opened up compressed.pdf and it still looked great!
+![Screenshot](docs/ss.png)
 
 ## Under the Hood
 
