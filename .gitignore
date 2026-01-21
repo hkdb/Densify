@@ -2,3 +2,12 @@
 *.swo
 .claude
 .crush
+context/
+
+# Build artifacts
+.env
+venv/
+dist/
+build/
+__pycache__/
+*.pyc

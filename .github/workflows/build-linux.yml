@@ -1,0 +1,55 @@
+name: Build for Linux
+
+on:
+  workflow_dispatch:
+  workflow_call:
+
+jobs:
+  build-linux:
+    name: Build for Linux
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      - name: Get version from tag
+        id: get_version
+        run: |
+          if [[ "$GITHUB_REF" == refs/tags/* ]]; then
+            echo "VERSION=${GITHUB_REF#refs/tags/v}" >> $GITHUB_OUTPUT
+          else
+            echo "VERSION=dev" >> $GITHUB_OUTPUT
+          fi
+      - name: Create tar.gz archive
+        run: |
+          VERSION=${{ steps.get_version.outputs.VERSION }}
+          mkdir -p "Densify-${VERSION}"
+          cp densify "Densify-${VERSION}/"
+          cp densify.desktop "Densify-${VERSION}/"
+          cp *.png "Densify-${VERSION}/"
+          cp __init__.py "Densify-${VERSION}/"
+          cp requirements.txt "Densify-${VERSION}/"
+          cp install.sh "Densify-${VERSION}/"
+          cp io.3df.osi.densify.metainfo.xml "Densify-${VERSION}/"
+          cp LICENSE "Densify-${VERSION}/" 2>/dev/null || true
+          cp README.md "Densify-${VERSION}/" 2>/dev/null || true
+          tar -czvf "Densify-${VERSION}.tar.gz" "Densify-${VERSION}"
+          mkdir -p dist
+          mv "Densify-${VERSION}.tar.gz" dist/
+      - name: Install dependencies
+        run: |
+          sudo apt update
+          sudo apt install -y desktop-file-utils
+          sudo ./AppImage/bootstrap.sh
+          python3 -m pip install pycairo
+          python3 -m pip install PyGObject
+      - name: Set up environment
+        run: |
+          cp .env.ci .env
+      - name: Build package
+        run: |
+          python3 build.py
+      - name: Store the distribution packages
+        uses: actions/upload-artifact@v4
+        with:
+          name: linux-dist
+          path: dist/

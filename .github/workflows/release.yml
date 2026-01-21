@@ -1,4 +1,4 @@
-name: Build and Release
+name: Create GitHub Release
 
 on:
   push:
@@ -6,132 +6,45 @@ on:
       - 'v*'
 
 jobs:
-  build:
-    runs-on: ubuntu-22.04
+  build-linux:
+    name: Build for Linux
+    uses: ./.github/workflows/build-linux.yml
 
+  github-release:
+    name: GitHub Release
+    needs: [build-linux]
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      id-token: write
     steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
-
-      - name: Get version from tag
-        id: get_version
-        run: echo "VERSION=${GITHUB_REF#refs/tags/v}" >> $GITHUB_OUTPUT
-
-      - name: Install system dependencies
-        run: |
-          sudo apt-get update
-          sudo apt-get install -y \
-            libgtk-4-dev \
-            libgirepository1.0-dev \
-            gir1.2-gtk-4.0 \
-            ghostscript \
-            libfuse2 \
-            file
-
-      - name: Create tar.gz archive
-        run: |
-          VERSION=${{ steps.get_version.outputs.VERSION }}
-          mkdir -p "Densify-${VERSION}"
-          cp densify "Densify-${VERSION}/"
-          cp densify.desktop "Densify-${VERSION}/"
-          cp *.png "Densify-${VERSION}/"
-          cp __init__.py "Densify-${VERSION}/"
-          cp requirements.txt "Densify-${VERSION}/"
-          cp install.sh "Densify-${VERSION}/"
-          cp io.3df.osi.densify.metainfo.xml "Densify-${VERSION}/"
-          cp LICENSE "Densify-${VERSION}/" 2>/dev/null || true
-          cp README.md "Densify-${VERSION}/" 2>/dev/null || true
-          tar -czvf "Densify-${VERSION}.tar.gz" "Densify-${VERSION}"
-
-      - name: Build AppImage
-        run: |
-          VERSION=${{ steps.get_version.outputs.VERSION }}
-
-          # Create build directory
-          mkdir -p build/AppDir/opt/Densify
-          cd build
-
-          # Download AppImage tools
-          wget -q "https://github.com/linuxdeploy/linuxdeploy/releases/download/continuous/linuxdeploy-x86_64.AppImage"
-          wget -q "https://raw.githubusercontent.com/linuxdeploy/linuxdeploy-plugin-conda/master/linuxdeploy-plugin-conda.sh"
-          chmod +x linuxdeploy-x86_64.AppImage linuxdeploy-plugin-conda.sh
-
-          # Copy application files
-          cp ../densify AppDir/opt/Densify/
-          cp ../__init__.py AppDir/opt/Densify/
-          cp ../header.png AppDir/opt/Densify/
-          cp ../icon.png AppDir/opt/Densify/
-
-          # Copy metainfo (AppStream metadata)
-          mkdir -p AppDir/usr/share/metainfo
-          cp ../io.3df.osi.densify.metainfo.xml AppDir/usr/share/metainfo/
-
-          # Create desktop file (using info from metainfo.xml)
-          mkdir -p AppDir/usr/share/applications
-          cat > AppDir/usr/share/applications/densify.desktop <<EOF
-          [Desktop Entry]
-          Type=Application
-          Name=Densify
-          GenericName=PDF Compressor
-          Comment=GTK4 GUI Wrapper for Compressing PDF Files with GhostScript
-          Icon=desktop-icon
-          Exec=densify
-          Terminal=false
-          Categories=Utility;
-          EOF
-
-          # Create AppRun script
-          cat > AppDir/AppRun <<'APPRUN'
-          #!/bin/bash
-          APPDIR="$(dirname "$(readlink -f "$0")")"
-          export PATH="${APPDIR}/usr/bin:${APPDIR}/usr/conda/bin:${PATH}"
-          export LD_LIBRARY_PATH="${APPDIR}/usr/conda/lib:${APPDIR}/usr/lib:${LD_LIBRARY_PATH}"
-          export PYTHONPATH="${APPDIR}/opt/Densify:${PYTHONPATH}"
-          export GI_TYPELIB_PATH="${APPDIR}/usr/conda/lib/girepository-1.0:${APPDIR}/usr/lib/girepository-1.0:${GI_TYPELIB_PATH}"
-          export XDG_DATA_DIRS="${APPDIR}/usr/share:${XDG_DATA_DIRS}"
-          # Create libffi.so.6 symlink if missing (compatibility fix)
-          if [ ! -e "${APPDIR}/usr/conda/lib/libffi.so.6" ] && [ -e "${APPDIR}/usr/conda/lib/libffi.so.8" ]; then
-              ln -sf libffi.so.8 "${APPDIR}/usr/conda/lib/libffi.so.6" 2>/dev/null || true
-          fi
-          exec "${APPDIR}/usr/conda/bin/python" "${APPDIR}/opt/Densify/densify" "$@"
-          APPRUN
-          chmod +x AppDir/AppRun
-          # Remove leading spaces from AppRun
-          sed -i 's/^          //' AppDir/AppRun
-
-          # Set environment for conda plugin (gtk4 is installed via conda, not system)
-          # Pin libffi=3.2 to get libffi.so.6 which pygobject was compiled against
-          export CONDA_CHANNELS="conda-forge"
-          export CONDA_PACKAGES="python=3.11;pygobject;pycairo;gtk4;glib;libffi=3.2"
-
-          # Build AppImage (no gtk plugin needed - gtk4 comes from conda)
-          ./linuxdeploy-x86_64.AppImage \
-            --appdir AppDir \
-            --icon-file ../desktop-icon.png \
-            --desktop-file AppDir/usr/share/applications/densify.desktop \
-            --plugin conda \
-            --output appimage || true
-
-          # Rename AppImage with version
-          mv Densify*.AppImage "../Densify-${VERSION}-x86_64.AppImage" 2>/dev/null || \
-          mv *.AppImage "../Densify-${VERSION}-x86_64.AppImage" 2>/dev/null || true
-
-          cd ..
-
-      - name: Upload artifacts
-        uses: actions/upload-artifact@v4
+      - name: Download Linux dist
+        uses: actions/download-artifact@v4
         with:
-          name: release-files
-          path: |
-            Densify-${{ steps.get_version.outputs.VERSION }}.tar.gz
-            Densify-${{ steps.get_version.outputs.VERSION }}-x86_64.AppImage
-          if-no-files-found: warn
-
-      - name: Upload to Release
-        uses: softprops/action-gh-release@v1
-        with:
-          files: |
-            Densify-${{ steps.get_version.outputs.VERSION }}.tar.gz
-            Densify-${{ steps.get_version.outputs.VERSION }}-x86_64.AppImage
+          name: linux-dist
+          path: dist/
+      - name: Create GitHub Pre-release
+        if: ${{ contains(github.ref_name, 'alpha') || contains(github.ref_name, 'beta') || contains(github.ref_name, 'dev') }}
         env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GITHUB_TOKEN: ${{ github.token }}
+        run: >-
+          gh release create
+          '${{ github.ref_name }}'
+          --repo '${{ github.repository }}'
+          --generate-notes --prerelease
+      - name: Create GitHub Release
+        if: ${{ !(contains(github.ref_name, 'alpha') || contains(github.ref_name, 'beta') || contains(github.ref_name, 'dev')) }}
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
+        run: >-
+          gh release create
+          '${{ github.ref_name }}'
+          --repo '${{ github.repository }}'
+          --generate-notes
+      - name: Upload dists to GitHub Release
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
+        run: >-
+          gh release upload
+          '${{ github.ref_name }}' dist/**
+          --repo '${{ github.repository }}'
