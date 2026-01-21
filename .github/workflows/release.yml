@@ -54,8 +54,7 @@ jobs:
           # Download AppImage tools
           wget -q "https://github.com/linuxdeploy/linuxdeploy/releases/download/continuous/linuxdeploy-x86_64.AppImage"
           wget -q "https://raw.githubusercontent.com/linuxdeploy/linuxdeploy-plugin-conda/master/linuxdeploy-plugin-conda.sh"
-          wget -q "https://raw.githubusercontent.com/linuxdeploy/linuxdeploy-plugin-gtk/master/linuxdeploy-plugin-gtk.sh"
-          chmod +x linuxdeploy-x86_64.AppImage linuxdeploy-plugin-conda.sh linuxdeploy-plugin-gtk.sh
+          chmod +x linuxdeploy-x86_64.AppImage linuxdeploy-plugin-conda.sh
 
           # Copy application files
           cp ../densify AppDir/opt/Densify/
@@ -94,18 +93,16 @@ jobs:
           EOF
           chmod +x AppDir/AppRun
 
-          # Set environment for conda plugin
+          # Set environment for conda plugin (gtk4 is installed via conda, not system)
           export CONDA_CHANNELS="conda-forge"
-          export CONDA_PACKAGES="pygobject;pycairo;gtk4;glib;libffi"
-          export DEPLOY_GTK_VERSION="4"
+          export CONDA_PACKAGES="python=3.11;pygobject;pycairo;gtk4;glib"
 
-          # Build AppImage
+          # Build AppImage (no gtk plugin needed - gtk4 comes from conda)
           ./linuxdeploy-x86_64.AppImage \
             --appdir AppDir \
             --icon-file ../desktop-icon.png \
             --desktop-file AppDir/usr/share/applications/densify.desktop \
             --plugin conda \
-            --plugin gtk \
             --output appimage || true
 
           # Rename AppImage with version
