@@ -1,9 +1,0 @@
-[Desktop Entry]
-Type=Application
-Name=Densify
-GenericName=PDF Compressor
-Comment=GUI Wrapper for Compressing PDFs with GhostScript
-Icon=desktop-icon
-Exec=densify
-Terminal=false
-Categories=Utility;

@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-"""GTK3 GUI Wrapper to Compress PDFs with GhostScript"""
+"""GTK4 GUI Wrapper to Compress PDFs with GhostScript"""
 
 __author__ = """hkdb"""
 __email__ = 'hkdb@3df.io'

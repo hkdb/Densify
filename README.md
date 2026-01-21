@@ -1,53 +1,9 @@
-# Densify v0.3.2
+# Densify
 **maintained by:** hkdb \<<hkdb@3df.io>\><br />
 
 ## Description
 
-A GTK+ GUI Application written in Python that simplifies compressing PDF files with Ghostscript
-
-## Change Log
-
-#### June 24th, 2024 - v0.3.2 Released
-
-- Fixed #9 - Recent & Drag & Drop - Thanks to @batikstudio
-- Fixed \ check
-- Added some other illegal filename characters that could potentially be dangerous
-
-#### May 17th, 2020 - v0.3.1 Released
-
-Hotfix:
-- Increased "do not show logo" condition to "any display under 800 (h)"
-
-#### May 17th, 2020 - v0.3.0 Released
-
-Features:
-- Added Error Handling Unsafe Character \`
-- Switched to Python3 - also fixes #4
-- Allow User Resize of Window
-- Desktop Notification
-- Handling Lower Screen Resolutions - #5
-- Refined installation script (v0.2)
-
-Bug Fixes:
-- Display Icon - #3
-
-Notes:
-
-- Changed installation Procedure in README
-
-
-### MAY 13th, 2018 - v0.2.0 Released
-
-Features:
-- Improved error handling of filenames - [issue #2](https://github.com/hkdb/Densify/issues/2)
-- Support for Chinese & other unicode file names
-
-Bug Fixes:
-- Support whitespaces in filenames - [issue #1](https://github.com/hkdb/Densify/issues/1)
-
-#### MAY 13th, 2018 - v0.1.0 Released
-
-- Birth of Densify
+A GTK GUI Application written in Python that simplifies compressing PDF files with Ghostscript
 
 ## Screenshots
 
@@ -65,32 +21,11 @@ gs -sDEVICE=pdfwrite -dCompatibilityLevel=1.6 -dPDFSETTINGS=/ebook
 "[input.pdf]"
 ```
 
-## Error Handling
-
-Currently, if any of the below conditions are met, the application will either automatically handle or show an error/warning dialog message that returns to the main window without doing anything upon the user clicking "OK". This is designed to prevent any dangerous execution of Ghostscript. For the ones that are questionable, it will warn the user and provide a chance to cancel or confirm.
-
-Automatically Handles:
-
-- Output file name was not specified, use "compressed.pdf" by default
-
-Shows an Error Dialog Message and Returns to Main Window Upon the User Clicking "OK":
-
-- Input file is not specified
-- Input file does not end with .pdf
-- Input File and Output File are the same
-- Input File Name Contains Unsupported Characters(/ \ : ; ` > < } { # * ' ")
-- Output File Name Contains Unsupported Characters(/ \ : ; ` > < } { # * ' ")
-
-Questionable Conditions that the application will verify with User via A Dialog Message:
-
-- Output File does not end with .pdf, verify with user that's really what they want
-- Output File Name Matches a File in the Output Directory
-
 ## Installation
 
 Make sure you install the dependencies like `notify-send` and `ghostscript`.
 
-You can then either download the latest AppImage from the release page or follow the below steps.
+You can then either download the latest AppImage(amd64 only) from the release page or follow the below steps.
 
 Step 1:
 
@@ -98,6 +33,7 @@ Clone Densify:
 ```
 git clone https://github.com/hkdb/Densify.git
 ```
+or download the tarball from the release page and untar.
 
 Step 2:
 
@@ -113,11 +49,15 @@ You should then see this:
 
 ```
 hkdb@machine:/opt/Densify$ sudo ./install.sh
-Installation Complete. If you don't see any errors above, you are good to go! :)
+Installation Complete. You are good to go! :)
 hkdb@machine:/opt/Densify$
 ```
 
 Now, you can search for "densify" in Gnome Shell Search and you will see that Densify is available to launch. Enjoy!
+
+## Changelog
+
+See [CHANGELOG.md](CHANGELOG.md).
 
 ## Disclaimer
 

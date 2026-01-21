@@ -4,11 +4,11 @@
 ### PROJECT:
 ### Densify
 ### VERSION:
-### v0.3.1
+### v0.4.0
 ### SCRIPT:
 ### Densify
 ### DESCRIPTION:
-### GTK+ application to easily compress pdf files w/ Ghostscript
+### GTK4 application to easily compress pdf files w/ Ghostscript
 ### MAINTAINED BY:
 ### hkdb <hkdb@3df.io>
 ### Disclaimer:
@@ -23,122 +23,145 @@ import queue
 import os
 import re
 import gi
-gi.require_version('Gtk', '3.0')
-from gi.repository import Gtk, GObject
-from gi.overrides import GLib
+gi.require_version('Gtk', '4.0')
+gi.require_version('Gdk', '4.0')
+from gi.repository import Gtk, Gdk, Gio, GLib, GObject
 import pathlib
 
-class MyWindow(Gtk.Window, threading.Thread):
+class MyWindow(Gtk.ApplicationWindow):
 
-    def __init__(self):
-        threading.Thread.__init__(self)
+    def __init__(self, **kwargs):
+        super().__init__(**kwargs)
 
         # Detect Path that the script is running from:
         run_path = pathlib.Path(__file__).parent.absolute()
         header = str(run_path) + "/header.png"
 
-        # Detect Screen Resolution
-        disp = ['xrandr']
-        disp_results = ['grep', '*']
-        p = subprocess.Popen(disp, stdout=subprocess.PIPE)
-        p2 = subprocess.Popen(disp_results, stdin=p.stdout, stdout=subprocess.PIPE)
-        p.stdout.close()
-        resolution_string, junk = p2.communicate()
-        resolution = resolution_string.split()[0]
-        rstring = str(resolution)
-        rstring = rstring[1:] # Remove "b" from string
-        rstring = rstring[1:] # Remove "'" from beginning of string
-        rstring = rstring[:-1] # Remove "'" from end of string
-        w, h = rstring.split("x")
-        height = int(h)
+        # Detect Screen Resolution using GDK (Wayland compatible)
+        display = Gdk.Display.get_default()
+        monitors = display.get_monitors()
+        if monitors.get_n_items() > 0:
+            monitor = monitors.get_item(0)
+            geometry = monitor.get_geometry()
+            height = geometry.height
+        else:
+            height = 800  # Default fallback
+
         if height < 800:
             window_height = 300
         else:
             window_height = 450
 
         # Set Window Specification
-        Gtk.Window.__init__(self, title="Densify - PDF Compression")
-        self.set_position(Gtk.WindowPosition.CENTER)
+        self.set_title("Densify - PDF Compression")
         self.set_default_size(window_height, 300)
         self.set_resizable(True)
-        self.box = Gtk.Box(orientation=Gtk.Orientation.VERTICAL, spacing=8, margin=20)
-        self.add(self.box)
+        self.box = Gtk.Box(orientation=Gtk.Orientation.VERTICAL, spacing=8)
+        self.box.set_margin_top(20)
+        self.box.set_margin_bottom(20)
+        self.box.set_margin_start(20)
+        self.box.set_margin_end(20)
+        self.set_child(self.box)
+
+        # Store compression types for DropDown
+        self.compression_types = ["ebook", "screen", "printer", "prepress", "default"]
+
+        # Initialize selected file path
+        self.selected_file = None
 
         # App Logo
         if height > 799:
-            self.image = Gtk.Image()
-            self.image.set_from_file(header)
-            self.box.pack_start(self.image, True, True, padding=1)
+            # Use Gtk.Picture for better image display in GTK4
+            self.image = Gtk.Picture()
+            self.image.set_filename(header)
+            self.image.set_can_shrink(False)  # Don't shrink below natural size
+            self.image.set_halign(Gtk.Align.CENTER)
+            self.box.append(self.image)
 
         # App About
         aLabel = Gtk.Label(label="An Open Source Initiative Sponsored by 3DF")
         aLabel.set_markup("<small>An <a href=\"https://osi.3df.io\"" "title=\"OSI @ 3DF\">OSI</a> application sponsored by <a href=\"https://3df.io\"" "title=\"3DF Ltd.\">3DF</a></small>")
-        self.box.pack_start(aLabel, True, True, 0)
+        aLabel.set_use_markup(True)
+        self.box.append(aLabel)
 
         # App Version
-        vLabel = Gtk.Label(label="v0.3.2")
+        vLabel = Gtk.Label(label="v0.4.0")
         vLabel.set_justify(Gtk.Justification.CENTER)
-        self.box.pack_start(vLabel, True, True, 0)
+        self.box.append(vLabel)
 
         # Separator
-        bar = Gtk.HSeparator()
-        self.box.pack_start(bar, True, True, 0)
+        bar = Gtk.Separator(orientation=Gtk.Orientation.HORIZONTAL)
+        self.box.append(bar)
 
         # Specify Input File
-        iLabel = Gtk.Label(label="PDF:", xalign=0)
-        self.box.pack_start(iLabel, True, True, 0)
-        self.iChooser = Gtk.FileChooserButton()
-        self.box.pack_start(self.iChooser, True, True, 0)
+        iLabel = Gtk.Label(label="PDF:")
+        iLabel.set_halign(Gtk.Align.START)
+        self.box.append(iLabel)
+        # FileChooserButton is removed in GTK4 - use Button with FileDialog
+        # Create a box to hold label and folder icon
+        file_box = Gtk.Box(orientation=Gtk.Orientation.HORIZONTAL, spacing=6)
+        self.file_label = Gtk.Label(label="Select PDF File...")
+        self.file_label.set_hexpand(True)
+        self.file_label.set_halign(Gtk.Align.START)
+        file_icon = Gtk.Image.new_from_icon_name("folder-open-symbolic")
+        file_box.append(self.file_label)
+        file_box.append(file_icon)
+        self.file_button = Gtk.Button()
+        self.file_button.set_child(file_box)
+        self.file_button.connect("clicked", self.on_file_button_clicked)
+        # Add drag and drop support
+        drop_target = Gtk.DropTarget.new(Gio.File, Gdk.DragAction.COPY)
+        drop_target.connect("drop", self.on_file_drop)
+        self.file_button.add_controller(drop_target)
+        self.box.append(self.file_button)
 
         # Separator
-        bar1 = Gtk.HSeparator()
-        self.box.pack_start(bar1, True, True, 0)
+        bar1 = Gtk.Separator(orientation=Gtk.Orientation.HORIZONTAL)
+        self.box.append(bar1)
 
         # Specify Compression Type
-        tLabel = Gtk.Label(label="Type:", xalign=0)
-        self.box.pack_start(tLabel, True, True, 0)
-        store = Gtk.ListStore(str)
-        for item in ["ebook", "screen", "printer", "prepress", "default"]:
-            store.append([item])
-        self.cType = Gtk.ComboBox()
-        self.cType.set_model(store)
+        tLabel = Gtk.Label(label="Type:")
+        tLabel.set_halign(Gtk.Align.START)
+        self.box.append(tLabel)
+        # Use ComboBoxText for classic dropdown appearance with arrow
+        self.cType = Gtk.ComboBoxText()
+        for item in self.compression_types:
+            self.cType.append_text(item)
         self.cType.set_active(0)
-        self.cType.connect("changed", self.on_combobox_changed)
-        self.box.pack_start(self.cType, True, True, 0)
-        cellrenderertext = Gtk.CellRendererText()
-        self.cType.pack_start(cellrenderertext, True)
-        self.cType.add_attribute(cellrenderertext, "text", 0)
+        self.box.append(self.cType)
 
         # Help Button - Compression Types
         self.help = Gtk.Button(label="?")
         self.help.connect("clicked", self.on_help_clicked)
-        self.box.pack_start(self.help, True, True, 0)
+        self.box.append(self.help)
 
         # Separator
-        bar2 = Gtk.HSeparator()
-        self.box.pack_start(bar2, True, True, 0)
+        bar2 = Gtk.Separator(orientation=Gtk.Orientation.HORIZONTAL)
+        self.box.append(bar2)
 
         # Specify Output File
-        oLabel = Gtk.Label(label="Output:", xalign=0)
-        self.box.pack_start(oLabel, True, True, 0)
+        oLabel = Gtk.Label(label="Output:")
+        oLabel.set_halign(Gtk.Align.START)
+        self.box.append(oLabel)
         self.oFile = Gtk.Entry()
         self.oFile.set_placeholder_text("compressed.pdf")
-        self.box.pack_start(self.oFile, True, True, 0)
+        self.box.append(self.oFile)
 
         # Help Button - Output File
         self.oHelp = Gtk.Button(label="?")
         self.oHelp.connect("clicked", self.on_oHelp_clicked)
-        self.box.pack_start(self.oHelp, True, True, 0)
+        self.box.append(self.oHelp)
 
         # Separator
-        bar3 = Gtk.HSeparator()
-        self.box.pack_start(bar3, True, True, 0)
+        bar3 = Gtk.Separator(orientation=Gtk.Orientation.HORIZONTAL)
+        self.box.append(bar3)
 
         # Progress Bar
-        pLabel = Gtk.Label(label="Status:", xalign=0)
-        self.box.pack_start(pLabel, True, True, 0)
+        pLabel = Gtk.Label(label="Status:")
+        pLabel.set_halign(Gtk.Align.START)
+        self.box.append(pLabel)
         self.progressbar = Gtk.ProgressBar()
-        self.box.pack_start(self.progressbar, True, True, 1)
+        self.box.append(self.progressbar)
         show_text = True
         text = "Ready"
         self.progressbar.set_text(text)
@@ -147,25 +170,72 @@ class MyWindow(Gtk.Window, threading.Thread):
         self.activity_mode = False
 
         # Separator
-        bar4 = Gtk.HSeparator()
-        self.box.pack_start(bar4, True, True, 0)
+        bar4 = Gtk.Separator(orientation=Gtk.Orientation.HORIZONTAL)
+        self.box.append(bar4)
 
         # Toggle Compress
         self.button = Gtk.Button(label="Compress Now!")
         self.button.set_sensitive(True)
         self.button.connect("clicked", self.on_button_clicked)
-        self.box.pack_start(self.button, True, True, 0)
+        self.box.append(self.button)
 
-    # ComboBox Handler
-    def on_combobox_changed(self, combobox):
-        treeiter = combobox.get_active_iter()
-        model = combobox.get_model()
+    # File Button Handler - Opens FileDialog
+    def on_file_button_clicked(self, button):
+        dialog = Gtk.FileDialog()
+        dialog.set_title("Select PDF File")
+
+        # Create filter for PDF files
+        filter_pdf = Gtk.FileFilter()
+        filter_pdf.set_name("PDF Files")
+        filter_pdf.add_mime_type("application/pdf")
+        filter_pdf.add_pattern("*.pdf")
+
+        filters = Gio.ListStore.new(Gtk.FileFilter)
+        filters.append(filter_pdf)
+        dialog.set_filters(filters)
+        dialog.set_default_filter(filter_pdf)
+
+        dialog.open(self, None, self.on_file_dialog_response)
+
+    def on_file_dialog_response(self, dialog, result):
+        try:
+            file = dialog.open_finish(result)
+            if file:
+                self.selected_file = file.get_path()
+                # Update label to show selected file
+                filename = os.path.basename(self.selected_file)
+                self.file_label.set_label(filename)
+        except GLib.Error as e:
+            # User cancelled or error
+            pass
+
+    def on_file_drop(self, drop_target, value, x, y):
+        """Handle file drag and drop"""
+        if isinstance(value, Gio.File):
+            file_path = value.get_path()
+            if file_path:
+                self.selected_file = file_path
+                filename = os.path.basename(file_path)
+                self.file_label.set_label(filename)
+                return True
+        return False
 
     # Help Button Handler
     def on_help_clicked(self, widget):
-        # Show Compression Type Descriptions Help Dialog
-        verbiage = "\n\n\nscreen:\n\nselects low-resolution output similar to the Acrobat Distiller \"Screen Optimized\" setting.\n\n\nebook:\n\nselects medium-resolution output similar to the Acrobat Distiller \"eBook\" setting.\n\n\nprinter:\n\nselects output similar to the Acrobat Distiller \"Print Optimized\" setting.\n\n\nprepress:\n\nselects output similar to Acrobat Distiller \"Prepress Optimized\" setting.\n\n\ndefault:\n\nselects output intended to be useful across a wide variety of uses, possibly at the expense of a larger output file."
-        self.info("Types of Compression", verbiage)
+        # Show Compression Type Descriptions Help Dialog with Pango markup for bold types
+        verbiage = (
+            "\n\n<b>screen:</b>\n"
+            "Selects low-resolution output similar to the Acrobat Distiller \"Screen Optimized\" setting.\n\n"
+            "<b>ebook:</b>\n"
+            "Selects medium-resolution output similar to the Acrobat Distiller \"eBook\" setting.\n\n"
+            "<b>printer:</b>\n"
+            "Selects output similar to the Acrobat Distiller \"Print Optimized\" setting.\n\n"
+            "<b>prepress:</b>\n"
+            "Selects output similar to Acrobat Distiller \"Prepress Optimized\" setting.\n\n"
+            "<b>default:</b>\n"
+            "Selects output intended to be useful across a wide variety of uses, possibly at the expense of a larger output file.\n\n"
+        )
+        self.info_markup("Types of Compression", verbiage)
 
     # oHelp Button Handler
     def on_oHelp_clicked(self, widget):
@@ -177,11 +247,11 @@ class MyWindow(Gtk.Window, threading.Thread):
     def on_button_clicked(self, widget):
         # Disable Compress Button
         self.button.set_sensitive(False)
-        # Set Progress Bar Text to "Completed" and Progress Bar to Pulse
+        # Set Progress Bar Text to "Compressing..." and Progress Bar to Pulse
         self.progress()
 
         # Set Command Compression Type Variable
-        iFile = self.iChooser.get_filename()
+        iFile = self.selected_file
         slash = "/"
         oName = self.oFile.get_text()
 
@@ -198,8 +268,7 @@ class MyWindow(Gtk.Window, threading.Thread):
             self.ready()
             # Enable Compress Button
             self.button.set_sensitive(True)
-
-            return 1
+            return
 
         # If Input file does not end with .pdf, show an error dialog box
         if not iFile.endswith(".pdf"):
@@ -210,13 +279,11 @@ class MyWindow(Gtk.Window, threading.Thread):
             self.ready()
             # Enable Compress Button
             self.button.set_sensitive(True)
-
-            return 1
+            return
 
         # Prep Type of Compression - Must happen before comparing iFile and oFile
-        if iFile != None:
-            iPath = os.path.dirname(iFile)
-            oFile = iPath + slash + oName
+        iPath = os.path.dirname(iFile)
+        oFile = iPath + slash + oName
 
         # If the Input File and Output File are the same, show an error dialog box
         if iFile == oFile:
@@ -227,72 +294,86 @@ class MyWindow(Gtk.Window, threading.Thread):
             self.ready()
             # Enable Compress Button
             self.button.set_sensitive(True)
-
-            return 1
-
-        # If Output File does not end with .pdf, verify with user that's really what they want
-        if not oFile.endswith(".pdf"):
-            verbiage = "The output file name you specified does not end with \".pdf\". Are you sure that's what you want?"
-            response = self.verify("Output file name does not end with \".pdf\"!", verbiage)
-
-            # If OK, then continue to overwrite existing file. If cancel, then stop and go back to main window
-            if response == Gtk.ResponseType.CANCEL:
-                self.ready()
-                # Enable Compress Button
-                self.button.set_sensitive(True)
-
-                return 1
+            return
 
         # Turn iFile to String to Prepare for Next Condition
         iName = str(os.path.basename(iFile))
 
         # If Specified Input File Name Contains Unsupported Characters, Show Dialog Error Dialog Box and Return to Main Window
-        # Security Procaution
+        # Security Precaution
         if re.search('[\\\\|/:;`><{}#*\'"]', iName):
             verbiage = "The input file name contains unsupported characters. Please ensure your input file name does not contain special characters / \\ : ; ` > < } { # * ' \""
             self.warning("Unsupported File Name Convention!", verbiage)
+            self.ready()
             self.button.set_sensitive(True)
-
-            return 1
+            return
 
         # If Specified Output File Name Contains Unsupported Characters, Show Dialog Error Dialog Box and Return to Main Window
-        # Security Procaution
+        # Security Precaution
         if re.search('[\\\\|/:;`><{}#*\'"]', oName):
             verbiage = "The output file name contains unsupported characters. Please ensure your output file name does not contain special characters / \\ : ; ` > < } {  # * ' \""
             self.warning("Unsupported File Name Convention!", verbiage)
+            self.ready()
             self.button.set_sensitive(True)
+            return
 
-            return 1
+        # Store context for async callbacks
+        context = {'iFile': iFile, 'oFile': oFile}
+
+        # Check if output file doesn't end with .pdf - if so, verify with user
+        if not oFile.endswith(".pdf"):
+            verbiage = "The output file name you specified does not end with \".pdf\". Are you sure that's what you want?"
+            self.verify("Output file name does not end with \".pdf\"!", verbiage,
+                       self._continue_after_pdf_check, context)
+            return
+
+        # Continue with file existence check
+        self._continue_after_pdf_check(context)
+
+    def _continue_after_pdf_check(self, context):
+        """Continue compression flow after PDF extension check"""
+        iFile = context['iFile']
+        oFile = context['oFile']
 
         # If Specified Output File Name Matches a File in the Output Directory
         if os.path.isfile(oFile):
-            # Show Error Dialog
+            # Show Verify Dialog
             verbiage = "There's a file with the same name, \"" + oFile + "\" already in the directory. Are you sure you want to overwrite?"
-            response = self.verify("WARNING!", verbiage)
+            self.verify("WARNING!", verbiage, self._do_compression, context)
+            return
 
-            # If OK, then continue to overwrite existing file. If cancel, then stop and go back to main window
-            if response == Gtk.ResponseType.CANCEL:
-                self.ready()
-                # Enable Compress Button
-                self.button.set_sensitive(True)
+        # No existing file, proceed directly to compression
+        self._do_compression(context)
 
-                return 1
+    def _do_compression(self, context):
+        """Perform the actual compression"""
+        iFile = context['iFile']
+        oFile = context['oFile']
 
         # Set Compression Type
-        cTypeIter = self.cType.get_active_iter()
-        cTypeModel = self.cType.get_model()
-        cType = cTypeModel[cTypeIter][0]
+        cType = self.cType.get_active_text()
 
-        # Build gs Command
-        self.cmmd = 'gs -sDEVICE=pdfwrite -dCompatibilityLevel=1.6 -dPDFSETTINGS=/' + cType + ' -dNOPAUSE -dQUIET -dBATCH -sOutputFile=' + "\"" + oFile + "\"" + ' ' + "\"" +iFile + "\""
+        # Build gs Command as list (safer - no shell injection possible)
+        self.cmmd = [
+            'gs',
+            '-sDEVICE=pdfwrite',
+            '-dCompatibilityLevel=1.6',
+            f'-dPDFSETTINGS=/{cType}',
+            '-dNOPAUSE',
+            '-dQUIET',
+            '-dBATCH',
+            f'-sOutputFile={oFile}',
+            iFile
+        ]
 
         # Start Compressing
         q = queue.Queue()
         cnow = threading.Thread(target=self.compress, args=[q])
         cnow.start()
-        # Keep Progress Bar Active
+        # Keep Progress Bar Active (GTK4 compatible)
         while cnow.is_alive():
-            Gtk.main_iteration_do(False)
+            main_context = GLib.MainContext.default()
+            main_context.iteration(False)
         # Don't continue until thread is finished
         cnow.join()
 
@@ -339,44 +420,99 @@ class MyWindow(Gtk.Window, threading.Thread):
             # Set Progress Bar to Ready and Stop Pulsing
             self.ready()
 
-    # Informational Dialog Message
+    # Informational Dialog Message (GTK4 AlertDialog)
     def info(self, title, verbiage):
         # Show Info Dialog
-        dialog = Gtk.MessageDialog(parent=self, flags=0, message_type=Gtk.MessageType.INFO,
-            buttons=Gtk.ButtonsType.OK, text=title)
-        dialog.format_secondary_text(verbiage)
-        response = dialog.run()
-        dialog.destroy()
+        dialog = Gtk.AlertDialog()
+        dialog.set_message(title)
+        dialog.set_detail(verbiage)
+        dialog.set_buttons(["OK"])
+        dialog.set_default_button(0)
+        dialog.set_cancel_button(0)
+        dialog.show(self)
 
-        return response
+    # Informational Dialog with Pango Markup support
+    def info_markup(self, title, markup_text):
+        # Create a custom dialog window for markup support
+        dialog = Gtk.Window(title=title)
+        dialog.set_transient_for(self)
+        dialog.set_modal(True)
+        dialog.set_resizable(False)
 
-    # Warning Dialog Message
+        # Main container
+        box = Gtk.Box(orientation=Gtk.Orientation.VERTICAL, spacing=12)
+        box.set_margin_top(20)
+        box.set_margin_bottom(20)
+        box.set_margin_start(20)
+        box.set_margin_end(20)
+        dialog.set_child(box)
+
+        # Title label
+        title_label = Gtk.Label()
+        title_label.set_markup(f"<b>{title}</b>")
+        box.append(title_label)
+
+        # Content label with markup - auto-sizes to content
+        content_label = Gtk.Label()
+        content_label.set_markup(markup_text)
+        content_label.set_halign(Gtk.Align.START)
+        content_label.set_valign(Gtk.Align.START)
+        box.append(content_label)
+
+        # OK button
+        ok_button = Gtk.Button(label="OK")
+        ok_button.connect("clicked", lambda btn: dialog.close())
+        ok_button.set_halign(Gtk.Align.END)
+        box.append(ok_button)
+
+        dialog.present()
+
+    # Warning Dialog Message (GTK4 AlertDialog)
     def warning(self, title, verbiage):
         # Pause Compression Progress Bar
         self.pause()
         # Show Error Dialog
-        dialog = Gtk.MessageDialog(parent=self, flags=0, message_type=Gtk.MessageType.WARNING,
-            buttons=Gtk.ButtonsType.OK, text=title)
-        dialog.format_secondary_text(verbiage)
-        response = dialog.run()
-        dialog.destroy()
+        dialog = Gtk.AlertDialog()
+        dialog.set_message(title)
+        dialog.set_detail(verbiage)
+        dialog.set_buttons(["OK"])
+        dialog.set_default_button(0)
+        dialog.set_cancel_button(0)
+        dialog.show(self)
 
-        return response
-
-    # Verify What to Do Dialog Message
-    def verify(self, title, verbiage):
+    # Verify What to Do Dialog Message (GTK4 AlertDialog with async callback)
+    def verify(self, title, verbiage, on_confirm_callback, context=None):
+        """
+        Shows a confirmation dialog. Calls on_confirm_callback(context) if user confirms.
+        """
         # Pause Compression Progress Bar
         self.pause()
-        # Show Error Dialog
-        dialog = Gtk.MessageDialog(parent=self, flags=0, message_type=Gtk.MessageType.WARNING,
-            buttons=Gtk.ButtonsType.OK_CANCEL, text=title)
-        dialog.format_secondary_text(verbiage)
-        response = dialog.run()
-        dialog.destroy()
-        # Resume Compression Progress Bar & Continue
-        self.resume()
 
-        return response
+        dialog = Gtk.AlertDialog()
+        dialog.set_message(title)
+        dialog.set_detail(verbiage)
+        dialog.set_buttons(["Cancel", "OK"])
+        dialog.set_default_button(1)  # OK
+        dialog.set_cancel_button(0)   # Cancel
+
+        def on_response(dialog, result):
+            try:
+                response = dialog.choose_finish(result)
+                # Resume Progress Bar
+                self.resume()
+                # response is button index: 0=Cancel, 1=OK
+                if response == 1 and on_confirm_callback:
+                    on_confirm_callback(context)
+                else:
+                    # User cancelled - reset state
+                    self.ready()
+                    self.button.set_sensitive(True)
+            except GLib.Error:
+                # Dialog was dismissed
+                self.ready()
+                self.button.set_sensitive(True)
+
+        dialog.choose(self, None, on_response)
 
     # Set Progress Bar Text to "Compressing..." and Progress Bar to Pulse
     def progress(self):
@@ -430,14 +566,18 @@ class MyWindow(Gtk.Window, threading.Thread):
     # Compression Function to execute gs as SubProcess to be Called on a Separate Thread
     def compress(self, out_queue):
         try:
-            process = subprocess.Popen(self.cmmd, shell=True, stdout=subprocess.PIPE)
+            # Using list args without shell=True prevents command injection
+            process = subprocess.Popen(self.cmmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
             out, err = process.communicate()
-            out_queue.put(True)
-        except:
-            if err == None:
-                print("There's an error with no trace data...")
+            # Check return code to determine success
+            if process.returncode == 0:
+                out_queue.put(True)
             else:
-                print(err)
+                if err:
+                    print(f"GhostScript error: {err.decode()}")
+                out_queue.put(False)
+        except Exception as e:
+            print(f"Compression error: {e}")
             out_queue.put(False)
 
     # Progress Bar Status Handler
@@ -458,10 +598,24 @@ class MyWindow(Gtk.Window, threading.Thread):
         # continues to get called
         return True
 
-# Initiate Window
-win = MyWindow()
-win.start()
-win.set_icon_from_file(str(pathlib.Path(__file__).parent.absolute()) + "/icon.png") # Set App Icon
-win.connect("destroy", Gtk.main_quit)
-win.show_all()
-Gtk.main()
+class DensifyApplication(Gtk.Application):
+    """GTK4 Application class for Densify"""
+
+    def __init__(self):
+        super().__init__(
+            application_id="io.3df.osi.densify",
+            flags=Gio.ApplicationFlags.FLAGS_NONE
+        )
+
+    def do_activate(self):
+        win = MyWindow(application=self)
+        win.present()
+
+
+def main():
+    app = DensifyApplication()
+    return app.run(None)
+
+
+if __name__ == "__main__":
+    main()

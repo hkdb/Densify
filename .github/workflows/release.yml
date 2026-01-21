@@ -1,0 +1,133 @@
+name: Build and Release
+
+on:
+  push:
+    tags:
+      - 'v*'
+
+jobs:
+  build:
+    runs-on: ubuntu-22.04
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Get version from tag
+        id: get_version
+        run: echo "VERSION=${GITHUB_REF#refs/tags/v}" >> $GITHUB_OUTPUT
+
+      - name: Install system dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y \
+            libgtk-4-dev \
+            libgirepository1.0-dev \
+            gir1.2-gtk-4.0 \
+            ghostscript \
+            libfuse2 \
+            file
+
+      - name: Create tar.gz archive
+        run: |
+          VERSION=${{ steps.get_version.outputs.VERSION }}
+          mkdir -p "Densify-${VERSION}"
+          cp densify "Densify-${VERSION}/"
+          cp densify.desktop "Densify-${VERSION}/"
+          cp *.png "Densify-${VERSION}/"
+          cp __init__.py "Densify-${VERSION}/"
+          cp requirements.txt "Densify-${VERSION}/"
+          cp install.sh "Densify-${VERSION}/"
+          cp io.3df.osi.densify.metainfo.xml "Densify-${VERSION}/"
+          cp LICENSE "Densify-${VERSION}/" 2>/dev/null || true
+          cp README.md "Densify-${VERSION}/" 2>/dev/null || true
+          tar -czvf "Densify-${VERSION}.tar.gz" "Densify-${VERSION}"
+
+      - name: Build AppImage
+        run: |
+          VERSION=${{ steps.get_version.outputs.VERSION }}
+
+          # Create build directory
+          mkdir -p build/AppDir/opt/Densify
+          cd build
+
+          # Download AppImage tools
+          wget -q "https://github.com/linuxdeploy/linuxdeploy/releases/download/continuous/linuxdeploy-x86_64.AppImage"
+          wget -q "https://raw.githubusercontent.com/linuxdeploy/linuxdeploy-plugin-conda/master/linuxdeploy-plugin-conda.sh"
+          wget -q "https://raw.githubusercontent.com/linuxdeploy/linuxdeploy-plugin-gtk/master/linuxdeploy-plugin-gtk.sh"
+          chmod +x linuxdeploy-x86_64.AppImage linuxdeploy-plugin-conda.sh linuxdeploy-plugin-gtk.sh
+
+          # Copy application files
+          cp ../densify AppDir/opt/Densify/
+          cp ../__init__.py AppDir/opt/Densify/
+          cp ../header.png AppDir/opt/Densify/
+          cp ../icon.png AppDir/opt/Densify/
+
+          # Copy metainfo (AppStream metadata)
+          mkdir -p AppDir/usr/share/metainfo
+          cp ../io.3df.osi.densify.metainfo.xml AppDir/usr/share/metainfo/
+
+          # Create desktop file (using info from metainfo.xml)
+          mkdir -p AppDir/usr/share/applications
+          cat > AppDir/usr/share/applications/densify.desktop <<EOF
+          [Desktop Entry]
+          Type=Application
+          Name=Densify
+          GenericName=PDF Compressor
+          Comment=GTK4 GUI Wrapper for Compressing PDF Files with GhostScript
+          Icon=desktop-icon
+          Exec=densify
+          Terminal=false
+          Categories=Utility;
+          EOF
+
+          # Create AppRun script
+          cat > AppDir/AppRun <<'EOF'
+          #!/bin/bash
+          APPDIR="$(dirname "$(readlink -f "$0")")"
+          export PATH="${APPDIR}/usr/bin:${APPDIR}/usr/conda/bin:${PATH}"
+          export LD_LIBRARY_PATH="${APPDIR}/usr/lib:${LD_LIBRARY_PATH}"
+          export PYTHONPATH="${APPDIR}/opt/Densify:${PYTHONPATH}"
+          export GI_TYPELIB_PATH="${APPDIR}/usr/lib/girepository-1.0:${GI_TYPELIB_PATH}"
+          export XDG_DATA_DIRS="${APPDIR}/usr/share:${XDG_DATA_DIRS}"
+          exec "${APPDIR}/usr/conda/bin/python" "${APPDIR}/opt/Densify/densify" "$@"
+          EOF
+          chmod +x AppDir/AppRun
+
+          # Set environment for conda plugin
+          export CONDA_CHANNELS="conda-forge"
+          export CONDA_PACKAGES="pygobject>=3.42.0 pycairo gtk4 glib libffi"
+          export DEPLOY_GTK_VERSION="4"
+
+          # Build AppImage
+          ./linuxdeploy-x86_64.AppImage \
+            --appdir AppDir \
+            --icon-file ../desktop-icon.png \
+            --desktop-file AppDir/usr/share/applications/densify.desktop \
+            --plugin conda \
+            --plugin gtk \
+            --output appimage || true
+
+          # Rename AppImage with version
+          mv Densify*.AppImage "../Densify-${VERSION}-x86_64.AppImage" 2>/dev/null || \
+          mv *.AppImage "../Densify-${VERSION}-x86_64.AppImage" 2>/dev/null || true
+
+          cd ..
+
+      - name: Upload artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: release-files
+          path: |
+            Densify-${{ steps.get_version.outputs.VERSION }}.tar.gz
+            Densify-${{ steps.get_version.outputs.VERSION }}-x86_64.AppImage
+          if-no-files-found: warn
+
+      - name: Upload to Release
+        uses: softprops/action-gh-release@v1
+        with:
+          files: |
+            Densify-${{ steps.get_version.outputs.VERSION }}.tar.gz
+            Densify-${{ steps.get_version.outputs.VERSION }}-x86_64.AppImage
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
