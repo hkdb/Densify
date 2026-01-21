@@ -24,8 +24,8 @@ jobs:
           sudo apt update
           sudo apt install -y desktop-file-utils
           sudo ./AppImage/bootstrap.sh
-          sudo pip3 install --upgrade meson ninja
-          pip3 install pycairo PyGObject
+          python3 -m pip install --upgrade pip setuptools wheel
+          pip3 install pycairo==1.25.1 PyGObject
       - name: Set up environment
         run: |
           cp .env.ci .env
