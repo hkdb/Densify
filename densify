@@ -28,6 +28,10 @@ gi.require_version('Gdk', '4.0')
 from gi.repository import Gtk, Gdk, Gio, GLib, GObject
 import pathlib
 
+# Check GTK version for FileDialog support (GTK 4.10+)
+GTK_VERSION = (Gtk.get_major_version(), Gtk.get_minor_version())
+HAS_FILE_DIALOG = GTK_VERSION >= (4, 10)
+
 class MyWindow(Gtk.ApplicationWindow):
 
     def __init__(self, **kwargs):
@@ -179,25 +183,41 @@ class MyWindow(Gtk.ApplicationWindow):
         self.button.connect("clicked", self.on_button_clicked)
         self.box.append(self.button)
 
-    # File Button Handler - Opens FileDialog
+    # File Button Handler - Opens FileDialog (GTK 4.10+) or FileChooserNative (older)
     def on_file_button_clicked(self, button):
-        dialog = Gtk.FileDialog()
-        dialog.set_title("Select PDF File")
-
         # Create filter for PDF files
         filter_pdf = Gtk.FileFilter()
         filter_pdf.set_name("PDF Files")
         filter_pdf.add_mime_type("application/pdf")
         filter_pdf.add_pattern("*.pdf")
 
-        filters = Gio.ListStore.new(Gtk.FileFilter)
-        filters.append(filter_pdf)
-        dialog.set_filters(filters)
-        dialog.set_default_filter(filter_pdf)
+        if HAS_FILE_DIALOG:
+            # GTK 4.10+ - Use new FileDialog API
+            dialog = Gtk.FileDialog()
+            dialog.set_title("Select PDF File")
 
-        dialog.open(self, None, self.on_file_dialog_response)
+            filters = Gio.ListStore.new(Gtk.FileFilter)
+            filters.append(filter_pdf)
+            dialog.set_filters(filters)
+            dialog.set_default_filter(filter_pdf)
+
+            dialog.open(self, None, self.on_file_dialog_response)
+        else:
+            # GTK < 4.10 - Use FileChooserNative (deprecated but works)
+            dialog = Gtk.FileChooserNative.new(
+                "Select PDF File",
+                self,
+                Gtk.FileChooserAction.OPEN,
+                "_Open",
+                "_Cancel"
+            )
+            dialog.add_filter(filter_pdf)
+            dialog.set_filter(filter_pdf)
+            dialog.connect("response", self.on_file_chooser_response)
+            dialog.show()
 
     def on_file_dialog_response(self, dialog, result):
+        """Handler for GTK 4.10+ FileDialog"""
         try:
             file = dialog.open_finish(result)
             if file:
@@ -208,6 +228,17 @@ class MyWindow(Gtk.ApplicationWindow):
         except GLib.Error as e:
             # User cancelled or error
             pass
+
+    def on_file_chooser_response(self, dialog, response):
+        """Handler for GTK < 4.10 FileChooserNative"""
+        if response == Gtk.ResponseType.ACCEPT:
+            file = dialog.get_file()
+            if file:
+                self.selected_file = file.get_path()
+                # Update label to show selected file
+                filename = os.path.basename(self.selected_file)
+                self.file_label.set_label(filename)
+        dialog.destroy()
 
     def on_file_drop(self, drop_target, value, x, y):
         """Handle file drag and drop"""
