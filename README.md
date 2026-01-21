@@ -38,7 +38,7 @@ Step 2:
 Go into the repo dir and execute the install.sh script from within the downloaded Densify directory to install this application:
 
 ```
-cd Densify
+cd Densify  # Or if release tarball: cd Densify-<version>
 sudo ./install.sh
 ```
 Enter your sudo password when the dialog pops up.
