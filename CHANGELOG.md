@@ -6,6 +6,7 @@
 - Fixed AppImage - [#15](https://github.com/hkdb/Densify/issues/15)
 - Added dependencies installation in `install.sh` - [#14](https://github.com/hkdb/Densify/issues/14)
 - Changed to Github Actions to build on release
+- Added option to open folder after successfully compressing pdf
 
 #### June 24th, 2024 - v0.3.2 Released
 

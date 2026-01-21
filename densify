@@ -409,7 +409,7 @@ class MyWindow(Gtk.ApplicationWindow):
 
             # Show Completion Dialog - Try Completed
             verbiage = "Your PDF File has been successfully compressed from " + str(iFileSize) + iUnit + " to " + str(oFileSize) + oUnit + "! Enjoy!"
-            self.info("PDF Compressed!", verbiage)
+            self.completion_dialog("PDF Compressed!", verbiage, oFile)
 
         else:
             # Notify User
@@ -466,6 +466,84 @@ class MyWindow(Gtk.ApplicationWindow):
         box.append(ok_button)
 
         dialog.present()
+
+    # Completion dialog with Open Folder option
+    def completion_dialog(self, title, verbiage, output_file):
+        """Shows completion dialog with OK and Open Folder buttons"""
+        dialog = Gtk.Window(title=title)
+        dialog.set_transient_for(self)
+        dialog.set_modal(True)
+        dialog.set_resizable(False)
+
+        # Main container
+        box = Gtk.Box(orientation=Gtk.Orientation.VERTICAL, spacing=12)
+        box.set_margin_top(20)
+        box.set_margin_bottom(20)
+        box.set_margin_start(20)
+        box.set_margin_end(20)
+        dialog.set_child(box)
+
+        # Title label
+        title_label = Gtk.Label()
+        title_label.set_markup(f"<b>{title}</b>")
+        box.append(title_label)
+
+        # Content label
+        content_label = Gtk.Label(label=verbiage)
+        content_label.set_wrap(True)
+        content_label.set_max_width_chars(50)
+        box.append(content_label)
+
+        # Button box
+        button_box = Gtk.Box(orientation=Gtk.Orientation.HORIZONTAL, spacing=8)
+        button_box.set_halign(Gtk.Align.END)
+        button_box.set_margin_top(8)
+
+        # Open Folder button
+        open_folder_btn = Gtk.Button(label="Open Folder")
+        open_folder_btn.connect("clicked", lambda btn: self._show_in_file_manager(output_file, dialog))
+        button_box.append(open_folder_btn)
+
+        # OK button
+        ok_button = Gtk.Button(label="OK")
+        ok_button.connect("clicked", lambda btn: dialog.close())
+        button_box.append(ok_button)
+
+        box.append(button_box)
+        dialog.present()
+
+    def _show_in_file_manager(self, file_path, dialog=None):
+        """Opens file manager with file highlighted using DBus or fallback"""
+        if dialog:
+            dialog.close()
+
+        file_uri = 'file://' + file_path
+
+        try:
+            # Try DBus FileManager1 interface (highlights the file in most file managers)
+            proxy = Gio.DBusProxy.new_for_bus_sync(
+                Gio.BusType.SESSION,
+                Gio.DBusProxyFlags.NONE,
+                None,
+                'org.freedesktop.FileManager1',
+                '/org/freedesktop/FileManager1',
+                'org.freedesktop.FileManager1',
+                None
+            )
+            proxy.call_sync(
+                'ShowItems',
+                GLib.Variant('(ass)', ([file_uri], '')),
+                Gio.DBusCallFlags.NONE,
+                -1,
+                None
+            )
+        except Exception:
+            # Fallback: open the containing folder with xdg-open
+            try:
+                folder_path = os.path.dirname(file_path)
+                subprocess.Popen(['xdg-open', folder_path])
+            except Exception as e:
+                print(f"Could not open file manager: {e}")
 
     # Warning Dialog Message (GTK4 AlertDialog)
     def warning(self, title, verbiage):
