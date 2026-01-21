@@ -206,9 +206,10 @@ class MyWindow(Gtk.ApplicationWindow):
             # GTK < 4.10 - Use FileChooserDialog (deprecated but works without portals)
             dialog = Gtk.FileChooserDialog(
                 title="Select PDF File",
-                parent=self,
                 action=Gtk.FileChooserAction.OPEN,
             )
+            dialog.set_transient_for(self)
+            dialog.set_modal(True)
             dialog.add_button("_Cancel", Gtk.ResponseType.CANCEL)
             dialog.add_button("_Open", Gtk.ResponseType.ACCEPT)
             dialog.add_filter(filter_pdf)
@@ -414,7 +415,7 @@ class MyWindow(Gtk.ApplicationWindow):
         # If try succeeds, tell user it succeeded, else, show an error dialog
         if success == True:
             # Notify User
-            subprocess.run(["notify-send", "PDF Compressed!"])
+            self.send_notification("PDF Compressed!", "Your PDF has been successfully compressed.")
 
             # Get File Size
             iFileSizeRaw = os.path.getsize(iFile)
@@ -444,7 +445,7 @@ class MyWindow(Gtk.ApplicationWindow):
 
         else:
             # Notify User
-            subprocess.run(["notify-send", "ERROR!"])
+            self.send_notification("ERROR!", "Something went wrong during compression.")
             # Show Error Dialog - Exception
             verbiage = "Something went wrong! Maybe your PDF file is corrupted?"
             self.info("ERROR!", verbiage)
@@ -555,6 +556,17 @@ class MyWindow(Gtk.ApplicationWindow):
 
         box.append(button_box)
         dialog.present()
+
+    def send_notification(self, title, body):
+        """Send desktop notification using Gio.Notification (no external dependencies)"""
+        try:
+            app = self.get_application()
+            notification = Gio.Notification.new(title)
+            notification.set_body(body)
+            app.send_notification(None, notification)
+        except Exception as e:
+            # Fallback: just print to console if notifications fail
+            print(f"Notification: {title} - {body}")
 
     def _show_in_file_manager(self, file_path, dialog=None):
         """Opens file manager with file highlighted using DBus or fallback"""
@@ -727,8 +739,12 @@ class MyWindow(Gtk.ApplicationWindow):
     # Compression Function to execute gs as SubProcess to be Called on a Separate Thread
     def compress(self, out_queue):
         try:
+            # Clear LD_LIBRARY_PATH so GhostScript uses system libraries (fixes AppImage conflicts)
+            env = os.environ.copy()
+            env.pop('LD_LIBRARY_PATH', None)
+            env.pop('LD_PRELOAD', None)
             # Using list args without shell=True prevents command injection
-            process = subprocess.Popen(self.cmmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+            process = subprocess.Popen(self.cmmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE, env=env)
             out, err = process.communicate()
             # Check return code to determine success
             if process.returncode == 0:
