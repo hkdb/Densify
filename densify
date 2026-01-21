@@ -203,18 +203,18 @@ class MyWindow(Gtk.ApplicationWindow):
 
             dialog.open(self, None, self.on_file_dialog_response)
         else:
-            # GTK < 4.10 - Use FileChooserNative (deprecated but works)
-            dialog = Gtk.FileChooserNative.new(
-                "Select PDF File",
-                self,
-                Gtk.FileChooserAction.OPEN,
-                "_Open",
-                "_Cancel"
+            # GTK < 4.10 - Use FileChooserDialog (deprecated but works without portals)
+            dialog = Gtk.FileChooserDialog(
+                title="Select PDF File",
+                parent=self,
+                action=Gtk.FileChooserAction.OPEN,
             )
+            dialog.add_button("_Cancel", Gtk.ResponseType.CANCEL)
+            dialog.add_button("_Open", Gtk.ResponseType.ACCEPT)
             dialog.add_filter(filter_pdf)
             dialog.set_filter(filter_pdf)
             dialog.connect("response", self.on_file_chooser_response)
-            dialog.show()
+            dialog.present()
 
     def on_file_dialog_response(self, dialog, result):
         """Handler for GTK 4.10+ FileDialog"""
