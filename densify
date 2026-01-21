@@ -558,12 +558,13 @@ class MyWindow(Gtk.ApplicationWindow):
         dialog.present()
 
     def send_notification(self, title, body):
-        """Send desktop notification using Gio.Notification (no external dependencies)"""
+        """Send desktop notification using notify-send with clean environment"""
         try:
-            app = self.get_application()
-            notification = Gio.Notification.new(title)
-            notification.set_body(body)
-            app.send_notification(None, notification)
+            # Clear LD_LIBRARY_PATH so notify-send uses system libraries (fixes AppImage conflicts)
+            env = os.environ.copy()
+            env.pop('LD_LIBRARY_PATH', None)
+            env.pop('LD_PRELOAD', None)
+            subprocess.run(["notify-send", title, body], env=env)
         except Exception as e:
             # Fallback: just print to console if notifications fail
             print(f"Notification: {title} - {body}")
