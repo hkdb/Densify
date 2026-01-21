@@ -451,16 +451,29 @@ class MyWindow(Gtk.ApplicationWindow):
             # Set Progress Bar to Ready and Stop Pulsing
             self.ready()
 
-    # Informational Dialog Message (GTK4 AlertDialog)
+    # Informational Dialog Message (GTK4 AlertDialog or MessageDialog fallback)
     def info(self, title, verbiage):
-        # Show Info Dialog
-        dialog = Gtk.AlertDialog()
-        dialog.set_message(title)
-        dialog.set_detail(verbiage)
-        dialog.set_buttons(["OK"])
-        dialog.set_default_button(0)
-        dialog.set_cancel_button(0)
-        dialog.show(self)
+        if HAS_FILE_DIALOG:
+            # GTK 4.10+ - Use AlertDialog
+            dialog = Gtk.AlertDialog()
+            dialog.set_message(title)
+            dialog.set_detail(verbiage)
+            dialog.set_buttons(["OK"])
+            dialog.set_default_button(0)
+            dialog.set_cancel_button(0)
+            dialog.show(self)
+        else:
+            # GTK < 4.10 - Use MessageDialog
+            dialog = Gtk.MessageDialog(
+                transient_for=self,
+                modal=True,
+                message_type=Gtk.MessageType.INFO,
+                buttons=Gtk.ButtonsType.OK,
+                text=title,
+                secondary_text=verbiage
+            )
+            dialog.connect("response", lambda d, r: d.destroy())
+            dialog.present()
 
     # Informational Dialog with Pango Markup support
     def info_markup(self, title, markup_text):
@@ -576,20 +589,33 @@ class MyWindow(Gtk.ApplicationWindow):
             except Exception as e:
                 print(f"Could not open file manager: {e}")
 
-    # Warning Dialog Message (GTK4 AlertDialog)
+    # Warning Dialog Message (GTK4 AlertDialog or MessageDialog fallback)
     def warning(self, title, verbiage):
         # Pause Compression Progress Bar
         self.pause()
-        # Show Error Dialog
-        dialog = Gtk.AlertDialog()
-        dialog.set_message(title)
-        dialog.set_detail(verbiage)
-        dialog.set_buttons(["OK"])
-        dialog.set_default_button(0)
-        dialog.set_cancel_button(0)
-        dialog.show(self)
+        if HAS_FILE_DIALOG:
+            # GTK 4.10+ - Use AlertDialog
+            dialog = Gtk.AlertDialog()
+            dialog.set_message(title)
+            dialog.set_detail(verbiage)
+            dialog.set_buttons(["OK"])
+            dialog.set_default_button(0)
+            dialog.set_cancel_button(0)
+            dialog.show(self)
+        else:
+            # GTK < 4.10 - Use MessageDialog
+            dialog = Gtk.MessageDialog(
+                transient_for=self,
+                modal=True,
+                message_type=Gtk.MessageType.WARNING,
+                buttons=Gtk.ButtonsType.OK,
+                text=title,
+                secondary_text=verbiage
+            )
+            dialog.connect("response", lambda d, r: d.destroy())
+            dialog.present()
 
-    # Verify What to Do Dialog Message (GTK4 AlertDialog with async callback)
+    # Verify What to Do Dialog Message (GTK4 AlertDialog or MessageDialog fallback)
     def verify(self, title, verbiage, on_confirm_callback, context=None):
         """
         Shows a confirmation dialog. Calls on_confirm_callback(context) if user confirms.
@@ -597,31 +623,57 @@ class MyWindow(Gtk.ApplicationWindow):
         # Pause Compression Progress Bar
         self.pause()
 
-        dialog = Gtk.AlertDialog()
-        dialog.set_message(title)
-        dialog.set_detail(verbiage)
-        dialog.set_buttons(["Cancel", "OK"])
-        dialog.set_default_button(1)  # OK
-        dialog.set_cancel_button(0)   # Cancel
+        if HAS_FILE_DIALOG:
+            # GTK 4.10+ - Use AlertDialog
+            dialog = Gtk.AlertDialog()
+            dialog.set_message(title)
+            dialog.set_detail(verbiage)
+            dialog.set_buttons(["Cancel", "OK"])
+            dialog.set_default_button(1)  # OK
+            dialog.set_cancel_button(0)   # Cancel
 
-        def on_response(dialog, result):
-            try:
-                response = dialog.choose_finish(result)
+            def on_response(dialog, result):
+                try:
+                    response = dialog.choose_finish(result)
+                    # Resume Progress Bar
+                    self.resume()
+                    # response is button index: 0=Cancel, 1=OK
+                    if response == 1 and on_confirm_callback:
+                        on_confirm_callback(context)
+                    else:
+                        # User cancelled - reset state
+                        self.ready()
+                        self.button.set_sensitive(True)
+                except GLib.Error:
+                    # Dialog was dismissed
+                    self.ready()
+                    self.button.set_sensitive(True)
+
+            dialog.choose(self, None, on_response)
+        else:
+            # GTK < 4.10 - Use MessageDialog
+            dialog = Gtk.MessageDialog(
+                transient_for=self,
+                modal=True,
+                message_type=Gtk.MessageType.QUESTION,
+                buttons=Gtk.ButtonsType.OK_CANCEL,
+                text=title,
+                secondary_text=verbiage
+            )
+
+            def on_response(dialog, response):
+                dialog.destroy()
                 # Resume Progress Bar
                 self.resume()
-                # response is button index: 0=Cancel, 1=OK
-                if response == 1 and on_confirm_callback:
+                if response == Gtk.ResponseType.OK and on_confirm_callback:
                     on_confirm_callback(context)
                 else:
                     # User cancelled - reset state
                     self.ready()
                     self.button.set_sensitive(True)
-            except GLib.Error:
-                # Dialog was dismissed
-                self.ready()
-                self.button.set_sensitive(True)
 
-        dialog.choose(self, None, on_response)
+            dialog.connect("response", on_response)
+            dialog.present()
 
     # Set Progress Bar Text to "Compressing..." and Progress Bar to Pulse
     def progress(self):
