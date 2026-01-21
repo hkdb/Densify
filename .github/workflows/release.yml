@@ -1,4 +1,4 @@
-name: Create GitHub Release
+name: Build and Release
 
 on:
   push:
@@ -10,41 +10,21 @@ jobs:
     name: Build for Linux
     uses: ./.github/workflows/build-linux.yml
 
-  github-release:
-    name: GitHub Release
+  upload-release:
+    name: Upload to Release
     needs: [build-linux]
     runs-on: ubuntu-latest
     permissions:
       contents: write
-      id-token: write
     steps:
       - name: Download Linux dist
         uses: actions/download-artifact@v4
         with:
           name: linux-dist
           path: dist/
-      - name: Create GitHub Pre-release
-        if: ${{ contains(github.ref_name, 'alpha') || contains(github.ref_name, 'beta') || contains(github.ref_name, 'dev') }}
+      - name: Upload to Release
+        uses: softprops/action-gh-release@v1
+        with:
+          files: dist/*
         env:
-          GITHUB_TOKEN: ${{ github.token }}
-        run: >-
-          gh release create
-          '${{ github.ref_name }}'
-          --repo '${{ github.repository }}'
-          --generate-notes --prerelease
-      - name: Create GitHub Release
-        if: ${{ !(contains(github.ref_name, 'alpha') || contains(github.ref_name, 'beta') || contains(github.ref_name, 'dev')) }}
-        env:
-          GITHUB_TOKEN: ${{ github.token }}
-        run: >-
-          gh release create
-          '${{ github.ref_name }}'
-          --repo '${{ github.repository }}'
-          --generate-notes
-      - name: Upload dists to GitHub Release
-        env:
-          GITHUB_TOKEN: ${{ github.token }}
-        run: >-
-          gh release upload
-          '${{ github.ref_name }}' dist/**
-          --repo '${{ github.repository }}'
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
