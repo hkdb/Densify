@@ -4,7 +4,7 @@
 
 - Ported to GTK4 - [#16](https://github.com/hkdb/Densify/issues/16)
 - Use command list to avoid shell injection (Security)
-- Fixed AppImage - [#15](https://github.com/hkdb/Densify/issues/15)
+- Fixed AppImage - [#15](https://github.com/hkdb/Densify/issues/15) & [17](https://github.com/hkdb/Densify/issues/17)
 - Added dependencies installation in `install.sh` - [#14](https://github.com/hkdb/Densify/issues/14)
 - Changed to Github Actions to build on release
 - Added option to open folder after successfully compressing pdf

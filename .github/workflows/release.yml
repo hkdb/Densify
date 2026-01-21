@@ -96,7 +96,7 @@ jobs:
 
           # Set environment for conda plugin
           export CONDA_CHANNELS="conda-forge"
-          export CONDA_PACKAGES="pygobject>=3.42.0 pycairo gtk4 glib libffi"
+          export CONDA_PACKAGES="pygobject pycairo gtk4 glib libffi"
           export DEPLOY_GTK_VERSION="4"
 
           # Build AppImage
