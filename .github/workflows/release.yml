@@ -7,7 +7,7 @@ on:
 
 jobs:
   build:
-    runs-on: ubuntu-20.04
+    runs-on: ubuntu-22.04
 
     steps:
       - name: Checkout code
@@ -82,20 +82,27 @@ jobs:
 
           # Create AppRun script
           cat > AppDir/AppRun <<'EOF'
-          #!/bin/bash
-          APPDIR="$(dirname "$(readlink -f "$0")")"
-          export PATH="${APPDIR}/usr/bin:${APPDIR}/usr/conda/bin:${PATH}"
-          export LD_LIBRARY_PATH="${APPDIR}/usr/lib:${LD_LIBRARY_PATH}"
-          export PYTHONPATH="${APPDIR}/opt/Densify:${PYTHONPATH}"
-          export GI_TYPELIB_PATH="${APPDIR}/usr/lib/girepository-1.0:${GI_TYPELIB_PATH}"
-          export XDG_DATA_DIRS="${APPDIR}/usr/share:${XDG_DATA_DIRS}"
-          exec "${APPDIR}/usr/conda/bin/python" "${APPDIR}/opt/Densify/densify" "$@"
-          EOF
+#!/bin/bash
+APPDIR="$(dirname "$(readlink -f "$0")")"
+export PATH="${APPDIR}/usr/bin:${APPDIR}/usr/conda/bin:${PATH}"
+export LD_LIBRARY_PATH="${APPDIR}/usr/conda/lib:${APPDIR}/usr/lib:${LD_LIBRARY_PATH}"
+export PYTHONPATH="${APPDIR}/opt/Densify:${PYTHONPATH}"
+export GI_TYPELIB_PATH="${APPDIR}/usr/conda/lib/girepository-1.0:${APPDIR}/usr/lib/girepository-1.0:${GI_TYPELIB_PATH}"
+export XDG_DATA_DIRS="${APPDIR}/usr/share:${XDG_DATA_DIRS}"
+
+# Create libffi.so.6 symlink if missing (compatibility fix)
+if [ ! -e "${APPDIR}/usr/conda/lib/libffi.so.6" ] && [ -e "${APPDIR}/usr/conda/lib/libffi.so.8" ]; then
+    ln -sf libffi.so.8 "${APPDIR}/usr/conda/lib/libffi.so.6" 2>/dev/null || true
+fi
+
+exec "${APPDIR}/usr/conda/bin/python" "${APPDIR}/opt/Densify/densify" "$@"
+EOF
           chmod +x AppDir/AppRun
 
           # Set environment for conda plugin (gtk4 is installed via conda, not system)
+          # Pin libffi=3.2 to get libffi.so.6 which pygobject was compiled against
           export CONDA_CHANNELS="conda-forge"
-          export CONDA_PACKAGES="python=3.11;pygobject;pycairo;gtk4;glib"
+          export CONDA_PACKAGES="python=3.11;pygobject;pycairo;gtk4;glib;libffi=3.2"
 
           # Build AppImage (no gtk plugin needed - gtk4 comes from conda)
           ./linuxdeploy-x86_64.AppImage \
