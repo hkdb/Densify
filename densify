@@ -16,6 +16,7 @@
 ### do the maintainers make any guarantees. Use at your own risk.
 ### ##############################################################
 
+import sys
 import threading
 import subprocess
 import traceback
@@ -38,7 +39,11 @@ class MyWindow(Gtk.ApplicationWindow):
         super().__init__(**kwargs)
 
         # Detect Path that the script is running from:
-        run_path = pathlib.Path(__file__).parent.absolute()
+        # For PyInstaller/AppImage, use _MEIPASS for bundled resources
+        if getattr(sys, 'frozen', False) and hasattr(sys, '_MEIPASS'):
+            run_path = pathlib.Path(sys._MEIPASS)
+        else:
+            run_path = pathlib.Path(__file__).parent.absolute()
         header = str(run_path) + "/header.png"
 
         # Detect Screen Resolution using GDK (Wayland compatible)
@@ -89,7 +94,7 @@ class MyWindow(Gtk.ApplicationWindow):
         self.box.append(aLabel)
 
         # App Version
-        vLabel = Gtk.Label(label="v0.4.1")
+        vLabel = Gtk.Label(label="v0.4.2")
         vLabel.set_justify(Gtk.Justification.CENTER)
         self.box.append(vLabel)
 

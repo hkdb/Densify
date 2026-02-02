@@ -39,7 +39,7 @@
   </screenshots>
 
   <releases>
-    <release version="0.4.1" date="2026-02-01">
+    <release version="0.4.2" date="2026-02-01">
       <description>
         <p>Fixed invalid application ID causing AppImage to to not pass appimage.github.io test</p>
       </description>

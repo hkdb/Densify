@@ -1,5 +1,9 @@
 # Change Log
 
+#### February 1st, 2026 - v0.4.2 Released
+
+- Fixed header image size for AppImage
+
 #### February 1st, 2026 - v0.4.1 Released
 
 - Fixed invalid application ID (io.3df → io._3df) - Application IDs must start with a letter per D-Bus spec
