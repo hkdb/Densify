@@ -42,7 +42,7 @@ jobs:
           cp __init__.py "Densify-${VERSION}/"
           cp requirements.txt "Densify-${VERSION}/"
           cp install.sh "Densify-${VERSION}/"
-          cp io.3df.osi.densify.metainfo.xml "Densify-${VERSION}/"
+          cp AppImage/io._3df.osi.densify.metainfo.xml "Densify-${VERSION}/"
           cp LICENSE "Densify-${VERSION}/" 2>/dev/null || true
           cp README.md "Densify-${VERSION}/" 2>/dev/null || true
           tar -czvf "Densify-${VERSION}.tar.gz" "Densify-${VERSION}"

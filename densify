@@ -89,7 +89,7 @@ class MyWindow(Gtk.ApplicationWindow):
         self.box.append(aLabel)
 
         # App Version
-        vLabel = Gtk.Label(label="v0.4.0")
+        vLabel = Gtk.Label(label="v0.4.1")
         vLabel.set_justify(Gtk.Justification.CENTER)
         self.box.append(vLabel)
 
@@ -781,7 +781,7 @@ class DensifyApplication(Gtk.Application):
 
     def __init__(self):
         super().__init__(
-            application_id="io.3df.osi.densify",
+            application_id="io._3df.osi.densify",
             flags=Gio.ApplicationFlags.FLAGS_NONE
         )
 

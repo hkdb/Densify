@@ -1,5 +1,10 @@
 # Change Log
 
+#### February 1st, 2026 - v0.4.1 Released
+
+- Fixed invalid application ID (io.3df → io._3df) - Application IDs must start with a letter per D-Bus spec
+- Reorganized AppImage assets into AppImage/ directory
+
 #### January 20th, 2026 - v0.4.0 Released
 
 - Ported to GTK4 - [#16](https://github.com/hkdb/Densify/issues/16)
