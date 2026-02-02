@@ -42,16 +42,9 @@ class MyWindow(Gtk.ApplicationWindow):
         # For PyInstaller/AppImage, use _MEIPASS for bundled resources
         if getattr(sys, 'frozen', False) and hasattr(sys, '_MEIPASS'):
             run_path = pathlib.Path(sys._MEIPASS)
-            print(f"DEBUG: Running from AppImage, _MEIPASS={sys._MEIPASS}")
         else:
             run_path = pathlib.Path(__file__).parent.absolute()
-            print(f"DEBUG: Running directly, path={run_path}")
         header = str(run_path) + "/header.png"
-        print(f"DEBUG: Header path={header}, exists={pathlib.Path(header).exists()}")
-        if pathlib.Path(header).exists():
-            import os
-            size = os.path.getsize(header)
-            print(f"DEBUG: Header file size={size} bytes")
 
         # Detect Screen Resolution using GDK (Wayland compatible)
         display = Gdk.Display.get_default()
@@ -90,7 +83,6 @@ class MyWindow(Gtk.ApplicationWindow):
             # Use Gtk.Picture for better image display in GTK4
             self.image = Gtk.Picture()
             self.image.set_filename(header)
-            print(f"DEBUG: Image widget created, filename={self.image.get_file()}")
             # Explicitly set size to ensure it displays at correct dimensions
             self.image.set_size_request(256, 256)
             self.image.set_can_shrink(False)  # Don't shrink below natural size
